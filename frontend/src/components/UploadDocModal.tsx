@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Upload, Button, message, Alert, Typography } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { uploadDocument } from '../api/knowledge';
+import { uploadDocument, UPLOAD_LIMITS } from '../api/knowledge';
 
 const { Dragger } = Upload;
 const { Text } = Typography;
@@ -34,24 +34,43 @@ export const UploadDocModal: React.FC<UploadDocModalProps> = ({
     setUploading(true);
     let successCount = 0;
     let failCount = 0;
+    const successfulUids: string[] = [];
 
     for (const fileItem of fileList) {
-      const originalFile = fileItem.originFileObj as File;
+      const originalFile =
+        fileItem.originFileObj instanceof File
+          ? fileItem.originFileObj
+          : (fileItem as unknown) instanceof File
+          ? (fileItem as unknown as File)
+          : null;
+
+      if (!originalFile) {
+        failCount++;
+        message.error(`文件 ${fileItem.name} 无法读取有效文件流，跳过处理`);
+        continue;
+      }
+
       try {
         await uploadDocument(knowledgeBaseId, originalFile);
         successCount++;
+        successfulUids.push(fileItem.uid);
       } catch (err: any) {
         failCount++;
-        message.error(`文件 ${fileItem.name} 处理失败: ${err.message}`);
+        const errorDetail = err.response?.data?.detail || err.message || '上传处理失败';
+        message.error(`文件 ${fileItem.name} 处理失败: ${errorDetail}`);
       }
     }
 
     setUploading(false);
-    if (successCount > 0) {
+    if (successCount > 0 && failCount === 0) {
       message.success(`成功上传并解析 ${successCount} 个文档`);
       setFileList([]);
       onSuccess();
       onClose();
+    } else if (successCount > 0 && failCount > 0) {
+      message.warning(`部分完成：成功上传 ${successCount} 个文档，${failCount} 个失败`);
+      setFileList((prev) => prev.filter((item) => !successfulUids.includes(item.uid)));
+      onSuccess();
     }
   };
 
@@ -61,11 +80,22 @@ export const UploadDocModal: React.FC<UploadDocModalProps> = ({
     },
     beforeUpload: (file: File) => {
       const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-      if (!['.pdf', '.md', '.markdown', '.txt'].includes(ext)) {
+      if (!UPLOAD_LIMITS.ALLOWED_EXTENSIONS.includes(ext as any)) {
         message.error(`不支持的文件格式 ${ext}，仅支持 .pdf, .md, .txt`);
         return Upload.LIST_IGNORE;
       }
-      setFileList((prev) => [...prev, file as unknown as UploadFile]);
+      if (file.size > UPLOAD_LIMITS.MAX_FILE_SIZE_BYTES) {
+        message.error(`文件 "${file.name}" 超过 ${UPLOAD_LIMITS.MAX_FILE_SIZE_MB}MB 大小限制`);
+        return Upload.LIST_IGNORE;
+      }
+      const wrapped: UploadFile = {
+        uid: (file as any).uid || `${Date.now()}-${file.name}`,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        originFileObj: file as any,
+      };
+      setFileList((prev) => [...prev, wrapped]);
       return false; // prevent automatic antd upload
     },
     fileList,
@@ -116,7 +146,7 @@ export const UploadDocModal: React.FC<UploadDocModalProps> = ({
           点击或将文档拖拽至此区域
         </p>
         <p className="ant-upload-hint" style={{ color: '#8c8c8c', fontSize: 13 }}>
-          支持单文件或批量上传：<strong>PDF (.pdf)</strong>、<strong>Markdown (.md)</strong>、<strong>纯文本 (.txt)</strong>，单个文件上限 20MB。
+          支持单文件或批量上传：<strong>PDF (.pdf)</strong>、<strong>Markdown (.md)</strong>、<strong>纯文本 (.txt)</strong>，单个文件上限 {UPLOAD_LIMITS.MAX_FILE_SIZE_MB}MB。
         </p>
       </Dragger>
     </Modal>

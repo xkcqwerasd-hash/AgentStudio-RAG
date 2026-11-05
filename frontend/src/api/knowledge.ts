@@ -25,7 +25,19 @@ export const getDocuments = async (kbId: string): Promise<DocumentItem[]> => {
   return res.data;
 };
 
+export const UPLOAD_LIMITS = {
+  MAX_FILE_SIZE_MB: 20,
+  MAX_FILE_SIZE_BYTES: 20 * 1024 * 1024,
+  ALLOWED_EXTENSIONS: ['.pdf', '.md', '.markdown', '.txt'] as const,
+};
+
 export const uploadDocument = async (kbId: string, file: File): Promise<DocumentItem> => {
+  if (!file || !(file instanceof File)) {
+    throw new Error('无效的文件对象，无法上传');
+  }
+  if (file.size > UPLOAD_LIMITS.MAX_FILE_SIZE_BYTES) {
+    throw new Error(`文件 "${file.name}" 超过 ${UPLOAD_LIMITS.MAX_FILE_SIZE_MB}MB 大小限制`);
+  }
   const formData = new FormData();
   formData.append('file', file);
   const res = await apiClient.post<DocumentItem>(
