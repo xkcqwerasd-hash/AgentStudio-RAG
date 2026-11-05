@@ -1,0 +1,70 @@
+# ==============================================================================
+# AgentStudio-RAG — Local Mode Docker Compose (Zero-Config, Single-User)
+# ==============================================================================
+# Usage:
+#   docker compose -f docker-compose.local.yml up -d --build
+# Access:
+#   http://localhost:8080
+# ==============================================================================
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: agentstudio-rag-backend:latest
+    container_name: agentstudio-backend-local
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+      - DEPLOYMENT_MODE=local
+      - DATABASE_URL=sqlite+aiosqlite:///./data/storage/agentstudio_rag.db
+      - UVICORN_WORKERS=1
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.deepseek.com}
+      - LLM_MODEL=${LLM_MODEL:-deepseek-chat}
+      - EMBEDDING_PROVIDER=${EMBEDDING_PROVIDER:-local_bge}
+      - EMBEDDING_MODEL_NAME=${EMBEDDING_MODEL_NAME:-BAAI/bge-small-zh-v1.5}
+      - EMBEDDING_DIMENSIONS=${EMBEDDING_DIMENSIONS:-512}
+      - HF_ENDPOINT=${HF_ENDPOINT:-https://hf-mirror.com}
+    volumes:
+      - ./data:/app/data
+      - agentstudio_local_models:/app/models_cache
+    networks:
+      - agentstudio_local_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: agentstudio-rag-frontend:latest
+    container_name: agentstudio-frontend-local
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - agentstudio_local_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  agentstudio_local_net:
+    driver: bridge
+
+volumes:
+  agentstudio_local_models:
+    name: agentstudio_local_models

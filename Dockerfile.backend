@@ -1,0 +1,59 @@
+# ==============================================================================
+# AgentStudio-RAG — Backend Production Dockerfile
+# ==============================================================================
+FROM python:3.12-slim AS runner
+
+# Environment variables for Python runtime & model caching paths
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    HF_HOME=/app/models_cache/huggingface \
+    FASTEMBED_CACHE_PATH=/app/models_cache/fastembed \
+    PROJECT_ROOT=/app
+
+WORKDIR /app
+
+# Install system dependencies (curl for healthchecks, ca-certificates for secure HTTPS)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root system user for security compliance (UID 10001)
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -d /app -s /bin/sh appuser
+
+# Install Python production dependencies
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Setup data and model caching directories with non-root ownership
+RUN mkdir -p /app/data/storage \
+             /app/data/uploads \
+             /app/data/uploads/attachments \
+             /app/models_cache
+
+# Pre-cache local BGE embedding model weights & reranker weights during build if network allows
+RUN python -c "from fastembed import TextEmbedding; TextEmbedding(model_name='BAAI/bge-small-zh-v1.5')" || true
+RUN HF_ENDPOINT=https://hf-mirror.com python -c "from huggingface_hub import hf_hub_download; hf_hub_download('Xenova/bge-reranker-base', 'tokenizer.json'); hf_hub_download('Xenova/bge-reranker-base', 'onnx/model_quantized.onnx')" || true
+
+# Copy backend application source code and scripts
+COPY backend/app/ ./app/
+COPY backend/create_admin.py ./
+COPY backend/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+# Ensure entire /app and pre-cached models are owned by non-root appuser
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root execution
+USER appuser
+
+EXPOSE 8000
+
+# Healthcheck endpoint monitoring
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost:8000/api/v1/health || exit 1
+
+ENTRYPOINT ["/app/entrypoint.sh"]

@@ -1,0 +1,40 @@
+# Git & Editors
+.git
+.gitignore
+.vscode
+.idea
+.gemini
+
+# Python caches & virtual environments
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.venv
+backend/.venv
+.pytest_cache
+*.log
+
+# Frontend build artifacts & node_modules
+frontend/node_modules
+frontend/dist
+dist
+
+# Runtime data & temp directories (persisted via Docker volumes)
+data/
+backend/data/
+backups/
+backups_test/
+*.db
+*.sqlite*
+*.sql
+*.tar.gz
+.env
+.env.*
+!.env.example
+docs/screenshots/
+scratch/
+edge_*
+
+# Test suites not required in runtime image
+backend/tests

@@ -1,0 +1,420 @@
+{
+  "benchmark": "M2.3 Context-aware Query Rewriting Evaluation",
+  "timestamp": "2026-11-01 19:16:18",
+  "corpus_size": 8,
+  "test_cases_count": 10,
+  "embedding_model": "BAAI/bge-small-zh-v1.5",
+  "llm_model": "deepseek-chat",
+  "metrics_summary": {
+    "original_query": {
+      "recall@1": 0.7,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "mrr": 0.85
+    },
+    "rewritten_query": {
+      "recall@1": 0.9,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "mrr": 0.95
+    },
+    "delta": {
+      "recall@1_delta": 0.2,
+      "recall@3_delta": 0.0,
+      "recall@5_delta": 0.0,
+      "mrr_delta": 0.1
+    }
+  },
+  "details": [
+    {
+      "id": "TC-01",
+      "category": "省略信息 (Ellipsis)",
+      "original_query": "那最小是多少？",
+      "rewritten_query": "网关连接池最小连接数是多少？",
+      "is_rewritten": true,
+      "rewrite_duration_ms": 2747.27,
+      "target_chunk_id": "chunk-1-gateway-pool",
+      "original_search": {
+        "top_chunks": [
+          "chunk-1-gateway-pool",
+          "chunk-8-db-readwrite",
+          "chunk-6-bge-embeddings",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 8.44
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-1-gateway-pool",
+          "chunk-8-db-readwrite",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover",
+          "chunk-6-bge-embeddings"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.57
+      },
+      "mrr_delta": 0.0,
+      "notes": "缺失主语'网关连接池'和属性'最小空闲连接数'"
+    },
+    {
+      "id": "TC-02",
+      "category": "代词指代 (Pronoun)",
+      "original_query": "它什么时候进入 OPEN 状态？",
+      "rewritten_query": "系统三态熔断器在什么条件下进入 OPEN 状态？",
+      "is_rewritten": true,
+      "rewrite_duration_ms": 2838.64,
+      "target_chunk_id": "chunk-3-model-breaker",
+      "original_search": {
+        "top_chunks": [
+          "chunk-5-redis-session",
+          "chunk-3-model-breaker",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover",
+          "chunk-6-bge-embeddings"
+        ],
+        "recall@1": 0,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 0.5,
+        "retrieval_ms": 5.94
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-3-model-breaker",
+          "chunk-5-redis-session",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover",
+          "chunk-6-bge-embeddings"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 7.61
+      },
+      "mrr_delta": 0.5,
+      "notes": "代词'它'指代'系统三态熔断器'"
+    },
+    {
+      "id": "TC-03",
+      "category": "序号指代 (Ordinal)",
+      "original_query": "第二种状态在什么条件下触发？",
+      "rewritten_query": "系统三态熔断器的 OPEN 状态在什么条件下触发？",
+      "is_rewritten": true,
+      "rewrite_duration_ms": 3015.06,
+      "target_chunk_id": "chunk-3-model-breaker",
+      "original_search": {
+        "top_chunks": [
+          "chunk-5-redis-session",
+          "chunk-3-model-breaker",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover",
+          "chunk-6-bge-embeddings"
+        ],
+        "recall@1": 0,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 0.5,
+        "retrieval_ms": 6.43
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-3-model-breaker",
+          "chunk-2-api-timeout",
+          "chunk-5-redis-session",
+          "chunk-4-model-failover",
+          "chunk-6-bge-embeddings"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 7.68
+      },
+      "mrr_delta": 0.5,
+      "notes": "'第二种状态'对应'OPEN 状态'"
+    },
+    {
+      "id": "TC-04",
+      "category": "连续追问 (Multi-turn)",
+      "original_query": "那和 BGE-M3 有什么区别？",
+      "rewritten_query": "BGE-small 和 BGE-M3 有什么区别？",
+      "is_rewritten": true,
+      "rewrite_duration_ms": 3125.44,
+      "target_chunk_id": "chunk-6-bge-embeddings",
+      "original_search": {
+        "top_chunks": [
+          "chunk-4-model-failover",
+          "chunk-6-bge-embeddings",
+          "chunk-7-python-decorators",
+          "chunk-8-db-readwrite",
+          "chunk-2-api-timeout"
+        ],
+        "recall@1": 0,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 0.5,
+        "retrieval_ms": 6.85
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-6-bge-embeddings",
+          "chunk-4-model-failover",
+          "chunk-8-db-readwrite",
+          "chunk-2-api-timeout",
+          "chunk-7-python-decorators"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.41
+      },
+      "mrr_delta": 0.5,
+      "notes": "跨多轮上下文对比 BGE-small 与 BGE-M3"
+    },
+    {
+      "id": "TC-05",
+      "category": "独立新问题 (Independent)",
+      "original_query": "Python 装饰器的原理与语法糖是什么？",
+      "rewritten_query": "Python 装饰器的原理与语法糖是什么？",
+      "is_rewritten": false,
+      "rewrite_duration_ms": 2745.29,
+      "target_chunk_id": "chunk-7-python-decorators",
+      "original_search": {
+        "top_chunks": [
+          "chunk-7-python-decorators",
+          "chunk-6-bge-embeddings",
+          "chunk-4-model-failover",
+          "chunk-3-model-breaker",
+          "chunk-8-db-readwrite"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 5.98
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-7-python-decorators",
+          "chunk-6-bge-embeddings",
+          "chunk-4-model-failover",
+          "chunk-3-model-breaker",
+          "chunk-8-db-readwrite"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.69
+      },
+      "mrr_delta": 0.0,
+      "notes": "与前文完全不相关的独立问题，严禁拼接熔断器"
+    },
+    {
+      "id": "TC-06",
+      "category": "实体省略 (Entity Omission)",
+      "original_query": "超时阈值统一设定为多少毫秒？",
+      "rewritten_query": "微服务网关的 API 接口规范中，超时阈值统一设定为多少毫秒？",
+      "is_rewritten": true,
+      "rewrite_duration_ms": 2962.01,
+      "target_chunk_id": "chunk-2-api-timeout",
+      "original_search": {
+        "top_chunks": [
+          "chunk-2-api-timeout",
+          "chunk-3-model-breaker",
+          "chunk-1-gateway-pool",
+          "chunk-6-bge-embeddings",
+          "chunk-5-redis-session"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.4
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-2-api-timeout",
+          "chunk-1-gateway-pool",
+          "chunk-6-bge-embeddings",
+          "chunk-3-model-breaker",
+          "chunk-4-model-failover"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.65
+      },
+      "mrr_delta": 0.0,
+      "notes": "省略主语'API 接口/微服务内部调用'"
+    },
+    {
+      "id": "TC-07",
+      "category": "指代转移 (Coreference Shift)",
+      "original_query": "它的过期时间是多久？",
+      "rewritten_query": "JWT Token 的过期时间是多久？",
+      "is_rewritten": true,
+      "rewrite_duration_ms": 5993.8,
+      "target_chunk_id": "chunk-5-redis-session",
+      "original_search": {
+        "top_chunks": [
+          "chunk-5-redis-session",
+          "chunk-2-api-timeout",
+          "chunk-3-model-breaker",
+          "chunk-8-db-readwrite",
+          "chunk-7-python-decorators"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 5.68
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-2-api-timeout",
+          "chunk-5-redis-session",
+          "chunk-3-model-breaker",
+          "chunk-1-gateway-pool",
+          "chunk-8-db-readwrite"
+        ],
+        "recall@1": 0,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 0.5,
+        "retrieval_ms": 7.46
+      },
+      "mrr_delta": -0.5,
+      "notes": "代词'它'指代'JWT Token / 用户会话'"
+    },
+    {
+      "id": "TC-08",
+      "category": "无需重写完备问题 (Complete Query)",
+      "original_query": "详细解释分布式会话在 Redis 集群中的切片模式与高可用方案。",
+      "rewritten_query": "详细解释分布式会话在 Redis 集群中的切片模式与高可用方案。",
+      "is_rewritten": false,
+      "rewrite_duration_ms": 2669.44,
+      "target_chunk_id": "chunk-5-redis-session",
+      "original_search": {
+        "top_chunks": [
+          "chunk-5-redis-session",
+          "chunk-6-bge-embeddings",
+          "chunk-8-db-readwrite",
+          "chunk-7-python-decorators",
+          "chunk-4-model-failover"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 7.46
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-5-redis-session",
+          "chunk-6-bge-embeddings",
+          "chunk-8-db-readwrite",
+          "chunk-7-python-decorators",
+          "chunk-4-model-failover"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.95
+      },
+      "mrr_delta": 0.0,
+      "notes": "问题本身完备，无需重写"
+    },
+    {
+      "id": "TC-09",
+      "category": "负例/歧义指代 (Ambiguity Analysis)",
+      "original_query": "它的最小空闲连接数是多少？",
+      "rewritten_query": "微服务网关的HTTP连接池的最小空闲连接数是多少？",
+      "is_rewritten": true,
+      "rewrite_duration_ms": 3152.94,
+      "target_chunk_id": "chunk-1-gateway-pool",
+      "original_search": {
+        "top_chunks": [
+          "chunk-1-gateway-pool",
+          "chunk-8-db-readwrite",
+          "chunk-6-bge-embeddings",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.39
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-1-gateway-pool",
+          "chunk-8-db-readwrite",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover",
+          "chunk-6-bge-embeddings"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 8.26
+      },
+      "mrr_delta": 0.0,
+      "notes": "多实体共存的潜在歧义情况，分析重写偏向性"
+    },
+    {
+      "id": "TC-10",
+      "category": "长跨度多轮追问 (Long Context)",
+      "original_query": "它的 CLOSED 状态失败率阈值是多少？",
+      "rewritten_query": "系统三态熔断器的 CLOSED 状态失败率阈值是多少？",
+      "is_rewritten": true,
+      "rewrite_duration_ms": 3093.43,
+      "target_chunk_id": "chunk-3-model-breaker",
+      "original_search": {
+        "top_chunks": [
+          "chunk-3-model-breaker",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover",
+          "chunk-5-redis-session",
+          "chunk-8-db-readwrite"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.85
+      },
+      "rewritten_search": {
+        "top_chunks": [
+          "chunk-3-model-breaker",
+          "chunk-2-api-timeout",
+          "chunk-4-model-failover",
+          "chunk-5-redis-session",
+          "chunk-1-gateway-pool"
+        ],
+        "recall@1": 1,
+        "recall@3": 1,
+        "recall@5": 1,
+        "mrr": 1.0,
+        "retrieval_ms": 6.78
+      },
+      "mrr_delta": 0.0,
+      "notes": "跨越中间无关模型话题，准确锚定熔断器 CLOSED 阈值"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+# ==============================================================================
+# AgentStudio-RAG — Server Mode Docker Compose (Multi-Tenant Production)
+# ==============================================================================
+# Usage:
+#   cp .env.example .env && docker compose up -d --build
+# Access:
+#   http://localhost:8080
+# Admin CLI initialization:
+#   docker compose exec backend python create_admin.py create -u admin -p "Pass123!"
+# ==============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: agentstudio-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agentstudio}
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Error: POSTGRES_PASSWORD must be configured in .env}"
+      POSTGRES_DB: ${POSTGRES_DB:-agentstudio_rag}
+    # Security: Database is strictly internal to Docker bridge network; never expose 5432 to host public
+    expose:
+      - "5432"
+    volumes:
+      - agentstudio_pgdata:/var/lib/postgresql/data
+    networks:
+      - agentstudio_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agentstudio} -d ${POSTGRES_DB:-agentstudio_rag}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: agentstudio-rag-backend:latest
+    container_name: agentstudio-backend
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+      DEPLOYMENT_MODE: server
+      SERVER_AUTH_SECRET: "${SERVER_AUTH_SECRET:?SERVER_AUTH_SECRET must be configured in .env}"
+      MODEL_ENCRYPTION_KEY: "${MODEL_ENCRYPTION_KEY:-}"
+      SERVER_ALLOW_REGISTRATION: "${SERVER_ALLOW_REGISTRATION:-false}"
+      AUTO_FIRST_USER_ADMIN: "${AUTO_FIRST_USER_ADMIN:-false}"
+      DATABASE_URL: "postgresql+asyncpg://${POSTGRES_USER:-agentstudio}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-agentstudio_rag}"
+      UVICORN_WORKERS: "${UVICORN_WORKERS:-4}"
+      LLM_PROVIDER: "${LLM_PROVIDER:-openai}"
+      OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
+      OPENAI_BASE_URL: "${OPENAI_BASE_URL:-https://api.deepseek.com}"
+      LLM_MODEL: "${LLM_MODEL:-deepseek-chat}"
+      EMBEDDING_PROVIDER: "${EMBEDDING_PROVIDER:-local_bge}"
+      EMBEDDING_MODEL_NAME: "${EMBEDDING_MODEL_NAME:-BAAI/bge-small-zh-v1.5}"
+      EMBEDDING_DIMENSIONS: "${EMBEDDING_DIMENSIONS:-512}"
+      RERANKER_ENABLED: "${RERANKER_ENABLED:-true}"
+      RERANKER_PROVIDER: "${RERANKER_PROVIDER:-local_onnx}"
+      HF_ENDPOINT: "${HF_ENDPOINT:-https://hf-mirror.com}"
+    volumes:
+      - agentstudio_data:/app/data
+      - agentstudio_models:/app/models_cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - agentstudio_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: agentstudio-rag-frontend:latest
+    container_name: agentstudio-frontend
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - agentstudio_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/healthz"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+networks:
+  agentstudio_net:
+    driver: bridge
+
+volumes:
+  agentstudio_pgdata:
+    name: agentstudio_pgdata
+  agentstudio_data:
+    name: agentstudio_data
+  agentstudio_models:
+    name: agentstudio_models

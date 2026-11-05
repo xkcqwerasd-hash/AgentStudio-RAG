@@ -1,0 +1,193 @@
+{"query_id": "Q-01", "chunk_id": "CHK-02-005", "relevance": 2, "evidence": "半开自愈探测机制放行 10% 试探流量，连续 5 次成功且延迟低于 2000ms 自愈复位为 CLOSED"}
+{"query_id": "Q-01", "chunk_id": "CHK-02-002", "relevance": 1, "evidence": "熔断器三态定义 CLOSED, OPEN, HALF_OPEN"}
+{"query_id": "Q-01", "chunk_id": "CHK-10-006", "relevance": 0, "evidence": "非核心通知服务的伪熔断丢弃策略"}
+{"query_id": "Q-02", "chunk_id": "CHK-01-002", "relevance": 2, "evidence": "网关基于前缀树 Trie Tree 算法实现高效 URL 路径动态匹配与最长路径匹配原则"}
+{"query_id": "Q-02", "chunk_id": "CHK-01-001", "relevance": 1, "evidence": "微服务网关通信与动态路由规范概述"}
+{"query_id": "Q-02", "chunk_id": "CHK-07-003", "relevance": 0, "evidence": "RPC 客户端负载均衡轮询算法"}
+{"query_id": "Q-03", "chunk_id": "CHK-03-002", "relevance": 2, "evidence": "RS256 非对称签名，私钥签发公钥验签，避免对称秘钥在多微服务下发共享的安全泄露风险"}
+{"query_id": "Q-03", "chunk_id": "CHK-03-001", "relevance": 1, "evidence": "鉴权体系与 JWT 令牌规范概述"}
+{"query_id": "Q-03", "chunk_id": "CHK-09-003", "relevance": 0, "evidence": "Fernet 对称加密算法"}
+{"query_id": "Q-04", "chunk_id": "CHK-05-004", "relevance": 2, "evidence": "大量缓存键在同一时间点集中并发过期引发雪崩，系统采用过期时间追加 1~300 秒随机扰动 Jitter"}
+{"query_id": "Q-04", "chunk_id": "CHK-05-001", "relevance": 1, "evidence": "Redis 分布式缓存三防治理概述"}
+{"query_id": "Q-04", "chunk_id": "CHK-05-002", "relevance": 0, "evidence": "布隆过滤器与缓存穿透防御"}
+{"query_id": "Q-05", "chunk_id": "CHK-12-004", "relevance": 2, "evidence": "分层可导航小世界图 HNSW，上层长边稀疏粗定位，下层密集收敛，具备 O(log N) 时间复杂度"}
+{"query_id": "Q-05", "chunk_id": "CHK-12-002", "relevance": 1, "evidence": "Dense 向量表征与余弦相似度等价性"}
+{"query_id": "Q-05", "chunk_id": "CHK-12-005", "relevance": 0, "evidence": "IVFFlat 倒排量化索引与乘积量化"}
+{"query_id": "Q-06", "chunk_id": "CHK-13-002", "relevance": 2, "evidence": "构建有向有环状态图 StateGraph，支持大模型自主思考-行动-观察循环与工具调度决策"}
+{"query_id": "Q-06", "chunk_id": "CHK-13-003", "relevance": 1, "evidence": "AgentState 强类型状态模式与上下文管理"}
+{"query_id": "Q-06", "chunk_id": "CHK-06-002", "relevance": 0, "evidence": "OpenAI 兼容协议反向代理中枢"}
+{"query_id": "Q-07", "chunk_id": "CHK-11-002", "relevance": 2, "evidence": "避免临时私有文件污染公共知识库索引，杜绝大文件全量 Embedding 引入数十秒延迟与高额 Token 成本，且支持安全物理销毁"}
+{"query_id": "Q-07", "chunk_id": "CHK-11-001", "relevance": 1, "evidence": "临时附件存储规范概述"}
+{"query_id": "Q-07", "chunk_id": "CHK-18-004", "relevance": 0, "evidence": "知识库细粒度 ACL 授权"}
+{"query_id": "Q-08", "chunk_id": "CHK-07-002", "relevance": 2, "evidence": "基于 HTTP/2 单 TCP 连接多路复用并行 Stream，且 Protobuf 二进制体积缩减 60% 且 CPU 解析耗时更低"}
+{"query_id": "Q-08", "chunk_id": "CHK-07-001", "relevance": 1, "evidence": "RPC 远程通信规范概述"}
+{"query_id": "Q-08", "chunk_id": "CHK-16-002", "relevance": 0, "evidence": "WebSocket 全双工长连接协议"}
+{"query_id": "Q-09", "chunk_id": "CHK-08-002", "relevance": 2, "evidence": "TraceId 为请求端到端全局唯一跟踪 ID，SpanId 代表单段操作调用标识，通过 W3C traceparent 透传"}
+{"query_id": "Q-09", "chunk_id": "CHK-08-001", "relevance": 1, "evidence": "分布式链路追踪体系概述"}
+{"query_id": "Q-09", "chunk_id": "CHK-08-005", "relevance": 0, "evidence": "结构化日志与集中式收集规范"}
+{"query_id": "Q-10", "chunk_id": "CHK-04-006", "relevance": 2, "evidence": "PostgreSQL MVCC 通过多版本元组让读操作访问快照版本，写操作生成新版本，实现读不阻塞写、写不阻塞读"}
+{"query_id": "Q-10", "chunk_id": "CHK-04-001", "relevance": 1, "evidence": "PostgreSQL 数据库调优指南概述"}
+{"query_id": "Q-10", "chunk_id": "CHK-05-003", "relevance": 0, "evidence": "Redis RedLock 互斥排他分布式锁"}
+{"query_id": "Q-11", "chunk_id": "CHK-01-005", "relevance": 2, "evidence": "网关连接池 min_idle 严格配置为 10，最大并发连接数 max_connections 设定为 100"}
+{"query_id": "Q-11", "chunk_id": "CHK-01-002", "relevance": 1, "evidence": "微服务网关前缀树匹配机制"}
+{"query_id": "Q-11", "chunk_id": "CHK-04-002", "relevance": 0, "evidence": "PostgreSQL 数据库连接池 minimum_idle=10, maximum_pool_size=50"}
+{"query_id": "Q-11", "chunk_id": "CHK-10-002", "relevance": 0, "evidence": "数据库连接池与网关连接池同名参数混淆干扰"}
+{"query_id": "Q-12", "chunk_id": "CHK-04-002", "relevance": 2, "evidence": "PostgreSQL 连接池 maximum_pool_size 严格设定为 50，connection_timeout_ms 为 30000 毫秒"}
+{"query_id": "Q-12", "chunk_id": "CHK-04-001", "relevance": 1, "evidence": "数据库连接池调优指南概述"}
+{"query_id": "Q-12", "chunk_id": "CHK-01-005", "relevance": 0, "evidence": "微服务网关连接池 max_connections=100"}
+{"query_id": "Q-13", "chunk_id": "CHK-01-004", "relevance": 2, "evidence": "网关默认全局调用超时时间为 5000 毫秒（5 秒），超时抛出 504 Gateway Timeout"}
+{"query_id": "Q-13", "chunk_id": "CHK-01-001", "relevance": 1, "evidence": "微服务 API 网关通信与动态路由规范概述"}
+{"query_id": "Q-13", "chunk_id": "CHK-10-003", "relevance": 0, "evidence": "Kafka 消息队列 session.timeout.ms=45000"}
+{"query_id": "Q-13", "chunk_id": "CHK-06-006", "relevance": 0, "evidence": "模型健康探测超时 3000 毫秒"}
+{"query_id": "Q-14", "chunk_id": "CHK-02-003", "relevance": 2, "evidence": "滑动统计时间窗口为连续 30 秒，请求失败率超过 50% 且达到 20 次请求时触发由 CLOSED 转移为 OPEN"}
+{"query_id": "Q-14", "chunk_id": "CHK-02-002", "relevance": 1, "evidence": "三态熔断器核心状态定义"}
+{"query_id": "Q-14", "chunk_id": "CHK-02-004", "relevance": 0, "evidence": "OPEN 状态冷静恢复期 60 秒"}
+{"query_id": "Q-15", "chunk_id": "CHK-03-003", "relevance": 2, "evidence": "Access Token 默认有效周期为 72 小时，Refresh Token 生命周期设定为 7 天"}
+{"query_id": "Q-15", "chunk_id": "CHK-03-002", "relevance": 1, "evidence": "基于 RS256 签名的无状态身份认证机制"}
+{"query_id": "Q-15", "chunk_id": "CHK-09-004", "relevance": 0, "evidence": "密钥轮换周期建议 180 天"}
+{"query_id": "Q-16", "chunk_id": "CHK-05-002", "relevance": 2, "evidence": "查空请求在 Redis 中缓存特殊空对象标识 __NULL__，其超时失效时间 TTL 强制设定为 60 秒"}
+{"query_id": "Q-16", "chunk_id": "CHK-05-001", "relevance": 1, "evidence": "缓存穿透防御体系与布隆过滤器"}
+{"query_id": "Q-16", "chunk_id": "CHK-03-004", "relevance": 0, "evidence": "Redis 令牌黑名单生存时间"}
+{"query_id": "Q-17", "chunk_id": "CHK-11-004", "relevance": 2, "evidence": "所有附件总 Token 数小于等于 full_text_threshold_tokens（默认 4000 tokens）触发全文保留轨"}
+{"query_id": "Q-17", "chunk_id": "CHK-11-002", "relevance": 1, "evidence": "临时附件与持久化知识库解耦原则"}
+{"query_id": "Q-17", "chunk_id": "CHK-06-005", "relevance": 0, "evidence": "ContextBudgetManager 预留模型输出 1500 tokens"}
+{"query_id": "Q-18", "chunk_id": "CHK-07-006", "relevance": 2, "evidence": "单个 Envoy Sidecar 代理配置 CPU 配额上限 2 核，常驻物理内存上限 1GB，转发网络延迟不超过 2ms"}
+{"query_id": "Q-18", "chunk_id": "CHK-07-001", "relevance": 1, "evidence": "RPC 远程通信与服务网格治理规范概述"}
+{"query_id": "Q-18", "chunk_id": "CHK-05-005", "relevance": 0, "evidence": "Redis 内存容量规划与 maxmemory 策略"}
+{"query_id": "Q-19", "chunk_id": "CHK-13-004", "relevance": 2, "evidence": "步数上限 max_steps 默认配置为 5 步，工具调用上限 max_tool_calls 默认配置为 10 次"}
+{"query_id": "Q-19", "chunk_id": "CHK-13-002", "relevance": 1, "evidence": "深度分析模式定位与自主决策循环"}
+{"query_id": "Q-19", "chunk_id": "CHK-01-004", "relevance": 0, "evidence": "微服务网关针对幂等只读接口至多重试 2 次"}
+{"query_id": "Q-20", "chunk_id": "CHK-08-003", "relevance": 2, "evidence": "常规正常 HTTP 请求默认全局采样率为 5%，错误请求与耗时超 1000ms 慢调用强制 100% 尾部采样"}
+{"query_id": "Q-20", "chunk_id": "CHK-08-002", "relevance": 1, "evidence": "OpenTelemetry 标准与跨线程 TraceId 透传"}
+{"query_id": "Q-20", "chunk_id": "CHK-01-003", "relevance": 0, "evidence": "金丝雀灰度发布默认将 10% 流量分流至 v2"}
+{"query_id": "Q-21", "chunk_id": "CHK-01-004", "relevance": 2, "evidence": "底层业务微服务死锁或大模型服务端推理耗时超过 5000ms 时，网关主动中断连接并抛出 504 Gateway Timeout"}
+{"query_id": "Q-21", "chunk_id": "CHK-10-007", "relevance": 2, "evidence": "504 Gateway Timeout 是 TCP 连接建立成功但下游超过 5000ms 未完成计算被网关掐断"}
+{"query_id": "Q-21", "chunk_id": "CHK-01-006", "relevance": 0, "evidence": "请求体超 20MB 抛出 413 Payload Too Large"}
+{"query_id": "Q-22", "chunk_id": "CHK-10-007", "relevance": 2, "evidence": "502 是建连遭遇拒绝或对端崩溃导致连接重置；504 是连接建立成功但下游计算超过 5000ms 被网关主动掐断"}
+{"query_id": "Q-22", "chunk_id": "CHK-01-004", "relevance": 1, "evidence": "网关调用超时 5000ms 异常中断处理"}
+{"query_id": "Q-22", "chunk_id": "CHK-01-007", "relevance": 0, "evidence": "网关速率超限返回 HTTP 429 提示"}
+{"query_id": "Q-23", "chunk_id": "CHK-01-006", "relevance": 2, "evidence": "单次 HTTP 请求体最大容量 max_body_size 为 20MB，超过则立刻返回 HTTP 413 Payload Too Large"}
+{"query_id": "Q-23", "chunk_id": "CHK-11-003", "relevance": 1, "evidence": "单文件物理大小上限严格限制为 20MB"}
+{"query_id": "Q-23", "chunk_id": "CHK-01-007", "relevance": 0, "evidence": "超出速率限制返回 HTTP 429 Too Many Requests"}
+{"query_id": "Q-24", "chunk_id": "CHK-02-002", "relevance": 2, "evidence": "CLOSED 正常闭锁放行；OPEN 完全熔断拦截并降级；HALF_OPEN 半开试探自愈放行极小比例前哨探针"}
+{"query_id": "Q-24", "chunk_id": "CHK-02-001", "relevance": 1, "evidence": "容灾防护与三态熔断器核心定义概述"}
+{"query_id": "Q-24", "chunk_id": "CHK-10-006", "relevance": 0, "evidence": "非核心通知服务的伪熔断丢弃策略"}
+{"query_id": "Q-25", "chunk_id": "CHK-02-006", "relevance": 2, "evidence": "实时跟踪大模型推理节点健康指标，汇总 QPS、P95 延迟、错误率及熔断状态，暴露 Prometheus 指标并动态路由降级"}
+{"query_id": "Q-25", "chunk_id": "CHK-02-001", "relevance": 1, "evidence": "高可用容灾与三态熔断架构设计概述"}
+{"query_id": "Q-25", "chunk_id": "CHK-08-004", "relevance": 0, "evidence": "Prometheus 四大黄金指标规范"}
+{"query_id": "Q-26", "chunk_id": "CHK-04-003", "relevance": 2, "evidence": "GIN 广义倒排索引强制用于包含文本切片及 extra_metadata_json 的 JSONB 字段，支持极速包含查询"}
+{"query_id": "Q-26", "chunk_id": "CHK-04-001", "relevance": 1, "evidence": "PostgreSQL 数据库索引设计原则概述"}
+{"query_id": "Q-26", "chunk_id": "CHK-04-002", "relevance": 0, "evidence": "B-Tree 索引适用主键与外键等值查询"}
+{"query_id": "Q-27", "chunk_id": "CHK-03-004", "relevance": 2, "evidence": "jti 为 JWT 的全局唯一 ID，用户注销时网关将 jti 写入 Redis 黑名单，TTL 设为剩余有效时长"}
+{"query_id": "Q-27", "chunk_id": "CHK-03-002", "relevance": 1, "evidence": "JWT Header、Payload 与 Signature 三段组成定义"}
+{"query_id": "Q-27", "chunk_id": "CHK-08-002", "relevance": 0, "evidence": "OpenTelemetry 全局唯一 128 位 TraceId 标识符"}
+{"query_id": "Q-28", "chunk_id": "CHK-06-003", "relevance": 2, "evidence": "TTFT 全称为 Time to First Token（首字响应时间），衡量从请求发出到收到首个 Token 的交互延迟"}
+{"query_id": "Q-28", "chunk_id": "CHK-06-001", "relevance": 1, "evidence": "大模型推理网关定位概述"}
+{"query_id": "Q-28", "chunk_id": "CHK-17-004", "relevance": 0, "evidence": "Markdown 代码块高亮与排版规范"}
+{"query_id": "Q-29", "chunk_id": "CHK-07-006", "relevance": 2, "evidence": "与业务容器同 Pod 伴生部署并执行全透明网络流量劫持的数据面网络代理容器"}
+{"query_id": "Q-29", "chunk_id": "CHK-07-001", "relevance": 1, "evidence": "服务网格治理规范概述"}
+{"query_id": "Q-29", "chunk_id": "CHK-01-002", "relevance": 0, "evidence": "微服务网关前缀树路由匹配机制"}
+{"query_id": "Q-30", "chunk_id": "CHK-09-005", "relevance": 2, "evidence": "WORM 全称为 Write Once, Read Many（一次写入多次读取），任何管理员无法修改或删除已生成的审计日志"}
+{"query_id": "Q-30", "chunk_id": "CHK-09-001", "relevance": 1, "evidence": "数据安全与合规审计规范概述"}
+{"query_id": "Q-30", "chunk_id": "CHK-04-006", "relevance": 0, "evidence": "PostgreSQL MVCC 读写不互斥机制"}
+{"query_id": "Q-31", "chunk_id": "CHK-03-002", "relevance": 2, "evidence": "网关基于 RS256 公钥本地高速验签实现无状态认证"}
+{"query_id": "Q-31", "chunk_id": "CHK-03-004", "relevance": 2, "evidence": "用户注销时网关将 JWT 的 jti 写入 Redis 分布式黑名单，TTL 设为剩余有效时长"}
+{"query_id": "Q-31", "chunk_id": "CHK-05-002", "relevance": 1, "evidence": "Redis 键过期机制"}
+{"query_id": "Q-31", "chunk_id": "CHK-18-002", "relevance": 0, "evidence": "RBAC 角色权限模型定义"}
+{"query_id": "Q-32", "chunk_id": "CHK-01-004", "relevance": 2, "evidence": "网关设定全局调用超时 5000ms，超时主动中断并抛出 504 异常"}
+{"query_id": "Q-32", "chunk_id": "CHK-02-004", "relevance": 2, "evidence": "下游故障导致失败率超标触发熔断进入 OPEN 状态，拦截 100% 流量并启动 60 秒冷静恢复期"}
+{"query_id": "Q-32", "chunk_id": "CHK-02-002", "relevance": 1, "evidence": "熔断器核心状态定义"}
+{"query_id": "Q-32", "chunk_id": "CHK-10-005", "relevance": 0, "evidence": "前端防抖时间 300ms 混淆干扰"}
+{"query_id": "Q-33", "chunk_id": "CHK-09-002", "relevance": 2, "evidence": "手机号等 PII 个人敏感信息在进入向量化前通过正则脱敏过滤器掩码处理"}
+{"query_id": "Q-33", "chunk_id": "CHK-09-003", "relevance": 2, "evidence": "API Key 采用 Fernet (AES-128-CBC + HMAC-SHA256) 对称加密持久化"}
+{"query_id": "Q-33", "chunk_id": "CHK-09-004", "relevance": 1, "evidence": "加密主密钥每 180 天主动轮换"}
+{"query_id": "Q-33", "chunk_id": "CHK-10-004", "relevance": 0, "evidence": "硬件安全模块 HSM 加密芯片对比干扰"}
+{"query_id": "Q-34", "chunk_id": "CHK-11-004", "relevance": 2, "evidence": "附件在 4000 tokens 内走 Full-Text Track 全文装配，超过走 BM25 Retrieval 检索装配"}
+{"query_id": "Q-34", "chunk_id": "CHK-06-005", "relevance": 2, "evidence": "ContextBudgetManager 扣除输出配额后，成对修剪历史对话并对切片按相似度贪心装箱"}
+{"query_id": "Q-34", "chunk_id": "CHK-11-002", "relevance": 1, "evidence": "临时附件与持久化知识库解耦原则"}
+{"query_id": "Q-34", "chunk_id": "CHK-04-002", "relevance": 0, "evidence": "数据库连接池配置参数"}
+{"query_id": "Q-35", "chunk_id": "CHK-03-006", "relevance": 2, "evidence": "网关提取 JWT 中的 tenant_id 并注入下游 HTTP 协议头 X-Tenant-Id 与 X-User-Id"}
+{"query_id": "Q-35", "chunk_id": "CHK-18-002", "relevance": 2, "evidence": "下游微服务与 ORM 拦截器自动注入 WHERE tenant_id = :current_tenant 实施行级隔离"}
+{"query_id": "Q-35", "chunk_id": "CHK-18-004", "relevance": 1, "evidence": "细粒度知识库访问授权列表 ACL"}
+{"query_id": "Q-35", "chunk_id": "CHK-08-002", "relevance": 0, "evidence": "分布式链路追踪 traceparent 头透传"}
+{"query_id": "Q-36", "chunk_id": "CHK-17-004", "relevance": 2, "evidence": "前端触发 abortController.abort() 发送 TCP FIN 中断网络连接，并响应式恢复输入状态"}
+{"query_id": "Q-36", "chunk_id": "CHK-06-004", "relevance": 2, "evidence": "后端捕获 asyncio.CancelledError，追加[回答已被用户中止]并安全提交事务释放数据库连接"}
+{"query_id": "Q-36", "chunk_id": "CHK-06-003", "relevance": 1, "evidence": "流式 SSE 协议事件序列定义"}
+{"query_id": "Q-36", "chunk_id": "CHK-16-004", "relevance": 0, "evidence": "WebSocket 断线指数退避重连算法"}
+{"query_id": "Q-37", "chunk_id": "CHK-08-002", "relevance": 2, "evidence": "网关接收请求生成 128 位全局唯一 TraceId，通过 W3C traceparent 协议头向下透传"}
+{"query_id": "Q-37", "chunk_id": "CHK-08-005", "relevance": 2, "evidence": "结构化 JSON 日志自动抓取当前 trace_id 输出，支持在控制台一键检索所有节点上下文"}
+{"query_id": "Q-37", "chunk_id": "CHK-07-002", "relevance": 1, "evidence": "gRPC 基于 HTTP/2 的多路复用连接"}
+{"query_id": "Q-37", "chunk_id": "CHK-03-004", "relevance": 0, "evidence": "JWT 唯一标识符 jti 机制"}
+{"query_id": "Q-38", "chunk_id": "CHK-13-006", "relevance": 2, "evidence": "工具节点在派发前使用系统受信任的 knowledge_base_id 物理覆盖大模型参数防注入"}
+{"query_id": "Q-38", "chunk_id": "CHK-14-003", "relevance": 2, "evidence": "EvidenceRegistry 基于 chunk_id 哈希全局去重，为新切片自增分配单调唯一的 Ref 序号"}
+{"query_id": "Q-38", "chunk_id": "CHK-14-005", "relevance": 1, "evidence": "CitationExtractor 确定性后验核验规则"}
+{"query_id": "Q-38", "chunk_id": "CHK-11-005", "relevance": 0, "evidence": "会话级内存倒排索引 EphemeralBM25Index"}
+{"query_id": "Q-39", "chunk_id": "CHK-01-005", "relevance": 2, "evidence": "网关连接池 min_idle=10, max_connections=100，管理面向下游服务的 HTTP 代理连接"}
+{"query_id": "Q-39", "chunk_id": "CHK-04-002", "relevance": 2, "evidence": "数据库连接池 minimum_idle=10, maximum_pool_size=50，管理面向数据库的 TCP 连接"}
+{"query_id": "Q-39", "chunk_id": "CHK-10-002", "relevance": 2, "evidence": "数据库与网关同名连接池参数的边界混淆与容量约束对比"}
+{"query_id": "Q-39", "chunk_id": "CHK-05-003", "relevance": 0, "evidence": "Redis RedLock 分布式锁机制"}
+{"query_id": "Q-40", "chunk_id": "CHK-15-002", "relevance": 2, "evidence": "QueryRewriter 结合上下文消解代词并补全主语，输出单行结构化 JSON"}
+{"query_id": "Q-40", "chunk_id": "CHK-14-005", "relevance": 2, "evidence": "CitationExtractor 扫描 Ref-X 标签并核对是否在实际切片范围内，剔除虚构引用"}
+{"query_id": "Q-40", "chunk_id": "CHK-15-005", "relevance": 1, "evidence": "重写前修剪历史消息至最近 3 轮"}
+{"query_id": "Q-40", "chunk_id": "CHK-13-004", "relevance": 0, "evidence": "智能体双重熔断机制"}
+{"query_id": "Q-41", "chunk_id": "CHK-02-003", "relevance": 2, "evidence": "在 30 秒滑动窗口内错误率超 50% 且达到 20 次请求时，三态熔断器切入 OPEN 状态阻断流量"}
+{"query_id": "Q-41", "chunk_id": "CHK-02-004", "relevance": 1, "evidence": "OPEN 状态下冷静恢复期 60 秒与降级兜底"}
+{"query_id": "Q-41", "chunk_id": "CHK-01-004", "relevance": 0, "evidence": "网关调用超时 5000ms 异常中断处理"}
+{"query_id": "Q-42", "chunk_id": "CHK-01-003", "relevance": 2, "evidence": "金丝雀灰度发布通过染色标将 10% 流量分流至 v2 灰度集群，90% 流量留在 v1 基准集群"}
+{"query_id": "Q-42", "chunk_id": "CHK-01-002", "relevance": 1, "evidence": "基于前缀树 Trie 树的动态路由匹配"}
+{"query_id": "Q-42", "chunk_id": "CHK-02-005", "relevance": 0, "evidence": "半开状态自愈探测放行 10% 真实前哨流量"}
+{"query_id": "Q-43", "chunk_id": "CHK-05-002", "relevance": 2, "evidence": "前置布隆过滤器拦截不存在的 ID，并对查空记录在 Redis 写入 __NULL__ 空值缓存 TTL=60s"}
+{"query_id": "Q-43", "chunk_id": "CHK-05-001", "relevance": 1, "evidence": "Redis 缓存三防治理规范概述"}
+{"query_id": "Q-43", "chunk_id": "CHK-05-004", "relevance": 0, "evidence": "缓存雪崩与过期时间随机抖动 Jitter"}
+{"query_id": "Q-44", "chunk_id": "CHK-06-004", "relevance": 2, "evidence": "协程捕获 CancelledError 异常，追加[回答已被用户中止]并安全提交事务保存半截回答"}
+{"query_id": "Q-44", "chunk_id": "CHK-17-004", "relevance": 1, "evidence": "前端 AbortController 中断并响应式恢复状态"}
+{"query_id": "Q-44", "chunk_id": "CHK-06-005", "relevance": 0, "evidence": "动态 Token 预算管理算法"}
+{"query_id": "Q-45", "chunk_id": "CHK-12-004", "relevance": 2, "evidence": "采用分层小世界图 HNSW 算法，上层粗定位下层收敛，将搜索时间复杂度优化至 O(log N)"}
+{"query_id": "Q-45", "chunk_id": "CHK-12-005", "relevance": 1, "evidence": "IVFFlat 聚类分划 Voronoi 细胞与乘积量化压缩"}
+{"query_id": "Q-45", "chunk_id": "CHK-12-006", "relevance": 0, "evidence": "当前版本的全量线性内存扫描实现"}
+{"query_id": "Q-46", "chunk_id": "CHK-13-004", "relevance": 2, "evidence": "设计双重熔断守护，限制单次任务最大步数 5 步与工具调用上限 10 次，超限分流 force_stop_node"}
+{"query_id": "Q-46", "chunk_id": "CHK-13-002", "relevance": 1, "evidence": "智能体深度分析模式定位"}
+{"query_id": "Q-46", "chunk_id": "CHK-07-005", "relevance": 0, "evidence": "RPC 链路重试风暴防范与重试预算"}
+{"query_id": "Q-47", "chunk_id": "CHK-11-006", "relevance": 2, "evidence": "用户删除会话级联触发物理清理函数，在操作系统层强制递归删除目录并释放内存倒排索引"}
+{"query_id": "Q-47", "chunk_id": "CHK-11-003", "relevance": 1, "evidence": "临时附件文件上传白名单与存储路径"}
+{"query_id": "Q-47", "chunk_id": "CHK-09-005", "relevance": 0, "evidence": "审计日志冷备存储留存不少于 180 天"}
+{"query_id": "Q-48", "chunk_id": "CHK-14-005", "relevance": 2, "evidence": "CitationExtractor 正向核验回答中的 Ref-X 序号必须存在于实际切片池中，虚构引用强制剔除"}
+{"query_id": "Q-48", "chunk_id": "CHK-14-006", "relevance": 1, "evidence": "多文档物理溯源标签生成与前端高亮展示"}
+{"query_id": "Q-48", "chunk_id": "CHK-09-002", "relevance": 0, "evidence": "敏感信息正则脱敏过滤器"}
+{"query_id": "Q-49", "chunk_id": "CHK-15-002", "relevance": 2, "evidence": "QueryRewriter 捕捉历史对话上下文，将模糊代词替换为具体客观实体，消除指代鸿沟"}
+{"query_id": "Q-49", "chunk_id": "CHK-15-003", "relevance": 1, "evidence": "结构化单行 JSON 强约束输出规范"}
+{"query_id": "Q-49", "chunk_id": "CHK-15-005", "relevance": 0, "evidence": "历史轮次裁剪至最近 3 轮"}
+{"query_id": "Q-50", "chunk_id": "CHK-18-006", "relevance": 2, "evidence": "配置多租户资源配额，限制知识库总数、存储容量、切片上限及单租户 50 QPS 并发限速"}
+{"query_id": "Q-50", "chunk_id": "CHK-18-002", "relevance": 1, "evidence": "多租户逻辑隔离架构概述"}
+{"query_id": "Q-50", "chunk_id": "CHK-01-007", "relevance": 0, "evidence": "网关单客户端 IP 令牌桶 500 QPS 限流"}
+{"query_id": "Q-51", "chunk_id": "CHK-01-007", "relevance": 2, "evidence": "单客户端 IP 平稳速率为 500 QPS，令牌桶最大容量设定为最大突发允许流量 Burst 峰值 1000"}
+{"query_id": "Q-51", "chunk_id": "CHK-01-002", "relevance": 1, "evidence": "微服务网关前缀树匹配机制"}
+{"query_id": "Q-51", "chunk_id": "CHK-18-006", "relevance": 0, "evidence": "租户级最大并发连接数限制为 50 QPS"}
+{"query_id": "Q-52", "chunk_id": "CHK-02-004", "relevance": 2, "evidence": "熔断器在 OPEN 状态下倒计时冷静恢复期 Cooling Period 默认严格设定为 60 秒"}
+{"query_id": "Q-52", "chunk_id": "CHK-02-005", "relevance": 1, "evidence": "HALF_OPEN 状态自愈机制"}
+{"query_id": "Q-52", "chunk_id": "CHK-10-005", "relevance": 0, "evidence": "前端输入框防抖时间 Debounce 300 毫秒"}
+{"query_id": "Q-53", "chunk_id": "CHK-04-002", "relevance": 2, "evidence": "idle_timeout_ms 空闲连接回收时间设定为 600000 毫秒（10 分钟）"}
+{"query_id": "Q-53", "chunk_id": "CHK-04-001", "relevance": 1, "evidence": "PostgreSQL 连接池调优指南概述"}
+{"query_id": "Q-53", "chunk_id": "CHK-16-003", "relevance": 0, "evidence": "WebSocket 连接持续处于空闲状态超过最大空闲阈值（默认 300 秒）网关主动断开连接"}
+{"query_id": "Q-54", "chunk_id": "CHK-05-003", "relevance": 2, "evidence": "基于 RedLock 算法向 Redis 申请互斥排他锁，锁超时保护严格配置为 10 秒"}
+{"query_id": "Q-54", "chunk_id": "CHK-05-001", "relevance": 1, "evidence": "Redis 分布式缓存三防规范概述"}
+{"query_id": "Q-54", "chunk_id": "CHK-05-002", "relevance": 0, "evidence": "空对象缓存 TTL 设定为 60 秒"}
+{"query_id": "Q-55", "chunk_id": "CHK-12-002", "relevance": 2, "evidence": "选用 BAAI/bge-small-zh-v1.5 嵌入模型，将变长文本切片映射到 512 维稠密连续向量空间"}
+{"query_id": "Q-55", "chunk_id": "CHK-12-003", "relevance": 1, "evidence": "余弦相似度计算与零向量安全防护"}
+{"query_id": "Q-55", "chunk_id": "CHK-09-003", "relevance": 0, "evidence": "Fernet 生成 128 位签名认证标签"}
+{"query_id": "Q-56", "chunk_id": "CHK-06-005", "relevance": 2, "evidence": "扣除预留的系统输出配额 1500 tokens 与安全边距 256 tokens，得出可用的纯输入预算池"}
+{"query_id": "Q-56", "chunk_id": "CHK-06-001", "relevance": 1, "evidence": "大模型推理网关定位概述"}
+{"query_id": "Q-56", "chunk_id": "CHK-11-004", "relevance": 0, "evidence": "会话附件全文保留阈值 4000 tokens"}
+{"query_id": "Q-57", "chunk_id": "CHK-07-004", "relevance": 2, "evidence": "后台守护协程以固定 5 秒周期向注册中心上报存活心跳，连续 3 次（15 秒）丢失则摘除实例"}
+{"query_id": "Q-57", "chunk_id": "CHK-07-001", "relevance": 1, "evidence": "RPC 远程通信与服务网格治理概述"}
+{"query_id": "Q-57", "chunk_id": "CHK-16-003", "relevance": 0, "evidence": "WebSocket PING 心跳帧周期 10 秒"}
+{"query_id": "Q-58", "chunk_id": "CHK-08-004", "relevance": 2, "evidence": "监控大盘围绕四大黄金指标组织：延迟（Latency）、流量（Traffic）、错误（Errors）、饱和度（Saturation）"}
+{"query_id": "Q-58", "chunk_id": "CHK-08-001", "relevance": 1, "evidence": "分布式链路追踪体系概述"}
+{"query_id": "Q-58", "chunk_id": "CHK-02-006", "relevance": 0, "evidence": "ModelHealthStore 模块导出的熔断指标"}
+{"query_id": "Q-59", "chunk_id": "CHK-09-003", "relevance": 2, "evidence": "Fernet 底层严格基于 AES-128-CBC 模式执行数据块对称加密，并使用 HMAC-SHA256 生成签名标签"}
+{"query_id": "Q-59", "chunk_id": "CHK-09-004", "relevance": 1, "evidence": "主密钥每 180 天进行一次主动轮换"}
+{"query_id": "Q-59", "chunk_id": "CHK-10-004", "relevance": 0, "evidence": "物理硬件安全模块 HSM 采用 AES-256-GCM 算法干扰"}
+{"query_id": "Q-60", "chunk_id": "CHK-17-002", "relevance": 2, "evidence": "消息气泡容器的最大宽度 max-width 严格约束为 840 像素（840px）"}
+{"query_id": "Q-60", "chunk_id": "CHK-17-006", "relevance": 2, "evidence": "左侧历史会话管理侧栏固定宽度为 260 像素（260px）"}
+{"query_id": "Q-60", "chunk_id": "CHK-17-003", "relevance": 1, "evidence": "一体化悬浮输入框 ChatComposer 采用 16px 大圆角"}
+{"query_id": "Q-60", "chunk_id": "CHK-01-006", "relevance": 0, "evidence": "网关请求体最大容量 20MB 限制"}

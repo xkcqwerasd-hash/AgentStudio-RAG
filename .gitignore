@@ -1,0 +1,101 @@
+# ==============================================================================
+# AgentStudio-RAG — Git Ignore Configuration
+# ==============================================================================
+
+# Python runtime, bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+backend/.venv/
+venv/
+ENV/
+
+# Testing & Code Quality
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Environment Variables & Secrets (CRITICAL SECURITY)
+.env
+.env.*
+!.env.example
+*.local
+**/.model_master_key*
+
+# Backups, Database Dumps & Archives
+backups/
+backups_test/
+*.sql
+*.tar.gz
+*.zip
+
+# Node.js & Frontend Build Artifacts
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+frontend/dist/
+
+# Runtime Data, User Uploads & Storage (Persisted via Docker Volumes)
+data/
+backend/data/storage/
+backend/data/uploads/
+backend/data/benchmark/
+**/storage/*
+!**/storage/.gitkeep
+**/uploads/*
+!**/uploads/.gitkeep
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite*
+
+# Local Model Weights & Cache
+models_cache/
+backend/models_cache/
+**/models_cache/
+
+# Logs & Temporary Files
+*.log
+**/*.log
+scratch/
+temp/
+tmp/
+edge_*
+
+# Root temporary testing screenshots & test artifacts
+/*.png
+test_*.pdf
+
+# IDE & OS Specific
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini

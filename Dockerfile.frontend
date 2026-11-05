@@ -1,0 +1,37 @@
+# ==============================================================================
+# AgentStudio-RAG — Frontend Multi-Stage Production Dockerfile
+# ==============================================================================
+
+# Stage 1: Build React SPA
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Install dependencies first for Docker layer caching
+COPY frontend/package.json frontend/package-lock.json* ./
+RUN npm ci
+
+# Copy source code and perform production build
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Production Nginx Runtime
+FROM nginx:alpine AS runner
+
+# Install curl for container HEALTHCHECK
+RUN apk add --no-cache curl
+
+# Remove default nginx static assets
+RUN rm -rf /usr/share/nginx/html/*
+
+# Copy compiled SPA static assets from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy custom Nginx configuration optimized for SPA & SSE proxying
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/healthz || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

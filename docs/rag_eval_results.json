@@ -1,0 +1,165 @@
+[
+  {
+    "category": "1. 明确事实检索 (单个 Chunk 明确答案)",
+    "query": "网关连接池的最小空闲连接数和最大连接数分别配置为多少？",
+    "expected": "准确检索到第1页网关连接池配置，并回答最小10、最大100。",
+    "answer": "根据参考资料，网关连接池的配置要求如下：\n\n- **最小空闲连接数（min_idle）**：设置为 10 个连接 [Ref-1]。\n- **最大连接数（max_connections）**：限制为 100 个并发连接 [Ref-1]。",
+    "citations": [
+      {
+        "citation_index": 1,
+        "chunk_id": "a01c21b0-307e-4874-81bc-343cab270da0",
+        "document_id": "30aed105-1e87-4e0c-86b5-345b3a1675f6",
+        "document_name": "enterprise_architecture_spec.pdf",
+        "page_number": 1,
+        "similarity_score": 0.2947,
+        "content_snippet": "AgentStudio-RAG 企业微服务与网关技术规范（第一部分）\n1. 服务网关架构\n企业统一微服务接入网关采用高性能异步网关设计。网关负责全站请求的统一鉴权、动态路由转发、T\nLS 证书卸载与限流控制。\n网关连接池配置要求：\n- 最小空闲连接数 (min_idle)：设置为 10 个连接。\n- 最大连接数 (max_connections)：限制为 100 个并发连接。\n- 请求超时时..."
+      }
+    ],
+    "exec_info": {
+      "mode": "workflow",
+      "retrieved_chunks_count": 1,
+      "retrieval_duration_ms": 2.76,
+      "generation_duration_ms": 3730.71,
+      "total_duration_ms": 3739.75,
+      "llm_model": "deepseek-chat"
+    },
+    "retrieved_count": 1
+  },
+  {
+    "category": "2. 多跳/跨分块综合问答 (需结合两个 Chunk)",
+    "query": "请综合说明系统在微服务网关接口超时时限上的规定，以及大模型服务在什么条件下会触发熔断进入 OPEN 状态？",
+    "expected": "结合第1页(网关超时5000ms)和第2页(熔断连续失败5次或失败率超30%)综合回答。",
+    "answer": "根据提供的参考资料，现将微服务网关接口超时时限规定与大模型服务触发熔断进入 OPEN 状态的条件综合说明如下：\n\n## 一、微服务网关接口超时时限规定\n\n企业统一微服务接入网关采用高性能异步网关设计，负责全站请求的统一鉴权、动态路由转发、TLS 证书卸载与限流控制。在超时控制方面，规范明确要求：**API 接口超时阈值统一设置为 5000 毫秒（即 5 秒）** [Ref-2]。\n\n作为参考，该网关连接池的其他相关配置要求包括：最小空闲连接数（min_idle）设置为 10 个连接，最大连接数（max_connections）限制为 100 个并发连接 [Ref-2]。\n\n## 二、大模型服务触发熔断进入 OPEN 状态的条件\n\n为防止外部大模型服务不可用引起系统雪崩，底层引入了 ModelHealthStore 状态机，包含 CLOSED、OPEN、HALF_OPEN 三种标准状态 [Ref-1]。其中，**触发熔断进入 OPEN 状态的条件为以下任一情形**：\n\n1. **连续失败次数达到 5 次**；\n2. **失败率超过 30%** [Ref-1]。\n\n当满足上述条件之一时，状态机强制跳变为 OPEN。在 OPEN 状态下，所有新请求将被拦截，直接降级至备用模型或离线缓存 [Ref-1]。\n\n此外，补充说明熔断器的其他状态转换逻辑：当过去 60 秒内调用失败率低于 15% 时，熔断器持续保持 CLOSED 正常状态 [Ref-1]；OPEN 状态持续满 30 秒后，熔断器自动进入 HALF_OPEN 半开探测状态，允许微量金丝雀探测请求通过，若连续 3 次调用成功则恢复至 CLOSED，若发生失败则退回 OPEN 状态 [Ref-1]。\n\n---\n\n**小结**：网关侧的超时阈值统一为 5 秒 [Ref-2]；模型侧的熔断触发则以\"连续失败 5 次\"或\"失败率超过 30%\"为判定标准 [Ref-1]，两者分别作用于请求链路的不同层级，共同构成系统的可用性保障机制。",
+    "citations": [
+      {
+        "citation_index": 2,
+        "chunk_id": "a01c21b0-307e-4874-81bc-343cab270da0",
+        "document_id": "30aed105-1e87-4e0c-86b5-345b3a1675f6",
+        "document_name": "enterprise_architecture_spec.pdf",
+        "page_number": 1,
+        "similarity_score": 0.2682,
+        "content_snippet": "AgentStudio-RAG 企业微服务与网关技术规范（第一部分）\n1. 服务网关架构\n企业统一微服务接入网关采用高性能异步网关设计。网关负责全站请求的统一鉴权、动态路由转发、T\nLS 证书卸载与限流控制。\n网关连接池配置要求：\n- 最小空闲连接数 (min_idle)：设置为 10 个连接。\n- 最大连接数 (max_connections)：限制为 100 个并发连接。\n- 请求超时时..."
+      },
+      {
+        "citation_index": 1,
+        "chunk_id": "cc775048-b67d-4752-ae2d-3857f2dc493c",
+        "document_id": "30aed105-1e87-4e0c-86b5-345b3a1675f6",
+        "document_name": "enterprise_architecture_spec.pdf",
+        "page_number": 2,
+        "similarity_score": 0.403,
+        "content_snippet": "AgentStudio-RAG 高可用与模型熔断规范（第二部分）\n3. 大模型调用三态熔断器设计\n为防止外部大模型服务不可用引起系统雪崩，底层引入 ModelHealthStore\n状态机，包含三种标准状态：\n- CLOSED 状态（正常状态）：所有模型请求正常流经并执行。当过去 60\n秒内调用失败率低于 15% 时，熔断器持续保持 CLOSED。\n- OPEN 状态（熔断开启）：当连续失败..."
+      }
+    ],
+    "exec_info": {
+      "mode": "workflow",
+      "retrieved_chunks_count": 3,
+      "retrieval_duration_ms": 2.41,
+      "generation_duration_ms": 4957.72,
+      "total_duration_ms": 4965.27,
+      "llm_model": "deepseek-chat"
+    },
+    "retrieved_count": 3
+  },
+  {
+    "category": "3. 专有名词与精确数值检索",
+    "query": "ModelHealthStore 在 CLOSED 状态下允许的最大失败率阈值是多少？持续保持 CLOSED 的时间窗口是多久？",
+    "expected": "识别专有名词 ModelHealthStore，回答过去60秒内失败率低于15%。",
+    "answer": "根据参考资料，ModelHealthStore 在 CLOSED 状态下的相关阈值与时间窗口如下：\n\n1. **最大失败率阈值**：当过去 60 秒内调用失败率低于 15% 时，熔断器持续保持 CLOSED 状态。也就是说，CLOSED 状态允许的失败率上限为 15%（低于该值即维持正常状态）[Ref-1]。\n\n2. **持续保持 CLOSED 的时间窗口**：该失败率的统计时间窗口为**过去 60 秒**，即在此 60 秒窗口内失败率低于 15% 时，熔断器保持 CLOSED [Ref-1]。\n\n补充说明：若连续失败次数达到 5 次或失败率超过 30%，状态机会强制跳变为 OPEN 状态 [Ref-1]。",
+    "citations": [
+      {
+        "citation_index": 1,
+        "chunk_id": "cc775048-b67d-4752-ae2d-3857f2dc493c",
+        "document_id": "30aed105-1e87-4e0c-86b5-345b3a1675f6",
+        "document_name": "enterprise_architecture_spec.pdf",
+        "page_number": 2,
+        "similarity_score": 0.3695,
+        "content_snippet": "AgentStudio-RAG 高可用与模型熔断规范（第二部分）\n3. 大模型调用三态熔断器设计\n为防止外部大模型服务不可用引起系统雪崩，底层引入 ModelHealthStore\n状态机，包含三种标准状态：\n- CLOSED 状态（正常状态）：所有模型请求正常流经并执行。当过去 60\n秒内调用失败率低于 15% 时，熔断器持续保持 CLOSED。\n- OPEN 状态（熔断开启）：当连续失败..."
+      }
+    ],
+    "exec_info": {
+      "mode": "workflow",
+      "retrieved_chunks_count": 3,
+      "retrieval_duration_ms": 2.21,
+      "generation_duration_ms": 3916.82,
+      "total_duration_ms": 3924.03,
+      "llm_model": "deepseek-chat"
+    },
+    "retrieved_count": 3
+  },
+  {
+    "category": "4. 知识库完全不存在答案的问题 (完全不相关领域)",
+    "query": "火星探测飞船的化学推进燃料中液氢与液氧的摩尔配比是多少？",
+    "expected": "命中防幻觉防御：明确告知未找到充分事实证据，拒绝猜测编造。",
+    "answer": "根据当前知识库检索结果，未找到与您提问相关的充分事实证据，无法给出确切回答。",
+    "citations": [],
+    "exec_info": {
+      "mode": "workflow",
+      "retrieved_chunks_count": 0,
+      "retrieval_duration_ms": 2.08,
+      "generation_duration_ms": 0.0,
+      "total_duration_ms": 7.58,
+      "llm_model": "deepseek-chat"
+    },
+    "retrieved_count": 0
+  },
+  {
+    "category": "5. 空知识库提问防御",
+    "query": "系统的熔断器机制是怎样的？",
+    "expected": "直接提示知识库尚未建立任何文档索引，耗时极低且不调用大模型。",
+    "answer": "该知识库目前尚未建立任何文档索引，请先上传并解析文档。",
+    "citations": [],
+    "exec_info": {
+      "mode": "workflow",
+      "retrieved_chunks_count": 0,
+      "retrieval_duration_ms": 0.0,
+      "generation_duration_ms": 0.0,
+      "total_duration_ms": 3.94,
+      "llm_model": "deepseek-chat"
+    },
+    "retrieved_count": 0
+  },
+  {
+    "category": "6. 主题相似但事实未提及的提问 (诱导性问题)",
+    "query": "微服务接入网关是否支持 GraphQL 查询聚合与客户端 WebSocket 心跳握手？",
+    "expected": "虽然提及微服务网关，但文档未提及 GraphQL/WebSocket，应拒答或指出未提及。",
+    "answer": "根据当前知识库检索结果，未找到与您提问相关的充分事实证据，无法给出确切回答。\n\n具体说明如下：\n\n1. **关于 GraphQL 查询聚合**：参考资料中仅描述了网关的核心职责，包括统一鉴权、动态路由转发、TLS 证书卸载与限流控制 [Ref-1]，以及连接池参数（min_idle、max_connections、请求超时）[Ref-1]，但**未提及**网关是否支持 GraphQL 查询聚合能力。\n\n2. **关于客户端 WebSocket 心跳握手**：参考资料中涉及网关连接池配置 [Ref-1]、Redis 分布式会话与 JWT 令牌机制 [Ref-1]、大模型调用三态熔断器 [Ref-3] 及多模型优先级故障转移 [Ref-2]，但**均未涉及** WebSocket 协议支持或心跳握手相关的内容。\n\n因此，现有资料不足以对上述两项功能支持情况作出判断。建议查阅网关技术规范中关于协议支持与 API 编排能力的其他章节，或补充相关文档后再行确认。",
+    "citations": [
+      {
+        "citation_index": 1,
+        "chunk_id": "a01c21b0-307e-4874-81bc-343cab270da0",
+        "document_id": "30aed105-1e87-4e0c-86b5-345b3a1675f6",
+        "document_name": "enterprise_architecture_spec.pdf",
+        "page_number": 1,
+        "similarity_score": 0.3402,
+        "content_snippet": "AgentStudio-RAG 企业微服务与网关技术规范（第一部分）\n1. 服务网关架构\n企业统一微服务接入网关采用高性能异步网关设计。网关负责全站请求的统一鉴权、动态路由转发、T\nLS 证书卸载与限流控制。\n网关连接池配置要求：\n- 最小空闲连接数 (min_idle)：设置为 10 个连接。\n- 最大连接数 (max_connections)：限制为 100 个并发连接。\n- 请求超时时..."
+      },
+      {
+        "citation_index": 3,
+        "chunk_id": "cc775048-b67d-4752-ae2d-3857f2dc493c",
+        "document_id": "30aed105-1e87-4e0c-86b5-345b3a1675f6",
+        "document_name": "enterprise_architecture_spec.pdf",
+        "page_number": 2,
+        "similarity_score": 0.1497,
+        "content_snippet": "AgentStudio-RAG 高可用与模型熔断规范（第二部分）\n3. 大模型调用三态熔断器设计\n为防止外部大模型服务不可用引起系统雪崩，底层引入 ModelHealthStore\n状态机，包含三种标准状态：\n- CLOSED 状态（正常状态）：所有模型请求正常流经并执行。当过去 60\n秒内调用失败率低于 15% 时，熔断器持续保持 CLOSED。\n- OPEN 状态（熔断开启）：当连续失败..."
+      },
+      {
+        "citation_index": 2,
+        "chunk_id": "84e348eb-9352-4a01-9188-a6a76bf0bb9f",
+        "document_id": "30aed105-1e87-4e0c-86b5-345b3a1675f6",
+        "document_name": "enterprise_architecture_spec.pdf",
+        "page_number": 2,
+        "similarity_score": 0.2151,
+        "content_snippet": "次调用成功，则恢复至 CLOSED；若发生失败，则退回 OPEN 状态。\n4. 多模型优先级故障转移 (Failover)\n模型调用链按优先级依次路由：Primary（首选主模型：DeepSeek-V3） ->\nSecondary（备选模型：SiliconFlow Qwen-2.5） ->\nFallback（保底本地模型：Ollama）。"
+      }
+    ],
+    "exec_info": {
+      "mode": "workflow",
+      "retrieved_chunks_count": 3,
+      "retrieval_duration_ms": 2.09,
+      "generation_duration_ms": 5519.15,
+      "total_duration_ms": 5526.2,
+      "llm_model": "deepseek-chat"
+    },
+    "retrieved_count": 3
+  }
+]

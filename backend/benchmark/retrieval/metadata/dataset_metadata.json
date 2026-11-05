@@ -1,0 +1,28 @@
+{
+  "dataset_name": "AgentStudio-RAG Benchmark Retrieval Corpus (M6.2)",
+  "version": "1.0.0",
+  "created_at": "2026-11-04",
+  "embedding_model": "BAAI/bge-small-zh-v1.5",
+  "embedding_dimensions": 512,
+  "chunk_splitter": "RecursiveCharacterTextSplitter",
+  "chunk_size": 500,
+  "chunk_overlap": 50,
+  "total_documents": 18,
+  "total_chunks": 112,
+  "total_queries": 60,
+  "categories": [
+    "CAT-1_技术概念解释",
+    "CAT-2_精确参数查询",
+    "CAT-3_错误码与术语查询",
+    "CAT-4_跨文档关联问题",
+    "CAT-5_同义表达与语义检索",
+    "CAT-6_中英文混合技术问题"
+  ],
+  "queries_per_category": 10,
+  "total_qrel_annotations": 193,
+  "relevance_scale": {
+    "2": "Core ground truth evidence directly answering the query",
+    "1": "Supporting or context background chunk",
+    "0": "Hard negative distractor"
+  }
+}
