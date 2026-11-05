@@ -1,8 +1,13 @@
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set
 import httpx
 
 from app.core.logging import logger
+from app.core.ssrf import (
+    SSRFBlockedException,
+    get_ssrf_safe_async_client,
+    validate_url_ssrf,
+)
 from app.schemas.model_provider import (
     ModelTestResponse,
     OllamaModelItem,
@@ -16,12 +21,25 @@ async def test_model_connectivity(
     api_key: Optional[str],
     model_name: str,
     timeout: float = 15.0,
+    trusted_hosts: Optional[Set[str]] = None,
 ) -> ModelTestResponse:
     """
     Test real connectivity and basic inference capability for an OpenAI-compatible endpoint.
     Sends a minimal completion request to verify base_url, api_key, and model existence.
+    Validates target URL against SSRF policy before making network requests.
     """
     clean_base = base_url.strip().rstrip("/")
+
+    # SSRF Pre-validation
+    try:
+        validate_url_ssrf(clean_base, trusted_hosts=trusted_hosts)
+    except SSRFBlockedException as exc:
+        return ModelTestResponse(
+            success=False,
+            latency_ms=0,
+            error=f"安全限制 (SSRF 防御)：{exc.detail}",
+        )
+
     # If base_url already ends with /v1 or not, we append /chat/completions appropriately
     if not clean_base.endswith("/chat/completions"):
         url = f"{clean_base}/chat/completions"
@@ -41,7 +59,7 @@ async def test_model_connectivity(
 
     start_t = time.perf_counter()
     try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
+        async with get_ssrf_safe_async_client(timeout=timeout, trusted_hosts=trusted_hosts) as client:
             resp = await client.post(url, json=payload, headers=headers)
             latency_ms = round((time.perf_counter() - start_t) * 1000, 2)
 
@@ -81,6 +99,13 @@ async def test_model_connectivity(
                     latency_ms=latency_ms,
                     error=f"服务返回 HTTP {resp.status_code}: {err_text}",
                 )
+    except SSRFBlockedException as exc:
+        latency_ms = round((time.perf_counter() - start_t) * 1000, 2)
+        return ModelTestResponse(
+            success=False,
+            latency_ms=latency_ms,
+            error=f"安全限制 (SSRF 防御)：{exc.detail}",
+        )
     except httpx.ConnectError as exc:
         latency_ms = round((time.perf_counter() - start_t) * 1000, 2)
         return ModelTestResponse(
@@ -107,15 +132,27 @@ async def test_model_connectivity(
 async def probe_ollama_models(
     base_url: str = "http://localhost:11434",
     timeout: float = 10.0,
+    trusted_hosts: Optional[Set[str]] = None,
 ) -> OllamaProbeResponse:
     """
     Probe downloaded model tags from an active Ollama instance via /api/tags.
+    Validates target URL against SSRF policy before sending probe request.
     """
     clean_base = base_url.strip().rstrip("/")
+
+    # SSRF Pre-validation
+    try:
+        validate_url_ssrf(clean_base, trusted_hosts=trusted_hosts)
+    except SSRFBlockedException as exc:
+        return OllamaProbeResponse(
+            success=False,
+            error=f"安全限制 (SSRF 防御)：{exc.detail}",
+        )
+
     url = f"{clean_base}/api/tags"
 
     try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
+        async with get_ssrf_safe_async_client(timeout=timeout, trusted_hosts=trusted_hosts) as client:
             resp = await client.get(url)
             if resp.status_code != 200:
                 return OllamaProbeResponse(
@@ -138,6 +175,11 @@ async def probe_ollama_models(
                     )
                 )
             return OllamaProbeResponse(success=True, models=items)
+    except SSRFBlockedException as exc:
+        return OllamaProbeResponse(
+            success=False,
+            error=f"安全限制 (SSRF 防御)：{exc.detail}",
+        )
     except httpx.ConnectError:
         return OllamaProbeResponse(
             success=False,
@@ -156,11 +198,23 @@ async def probe_vllm_models(
     base_url: str = "http://localhost:8000/v1",
     api_key: Optional[str] = None,
     timeout: float = 10.0,
+    trusted_hosts: Optional[Set[str]] = None,
 ) -> VLLMProbeResponse:
     """
     Probe available models on a vLLM or OpenAI-compatible server via /v1/models.
+    Validates target URL against SSRF policy before sending probe request.
     """
     clean_base = base_url.strip().rstrip("/")
+
+    # SSRF Pre-validation
+    try:
+        validate_url_ssrf(clean_base, trusted_hosts=trusted_hosts)
+    except SSRFBlockedException as exc:
+        return VLLMProbeResponse(
+            success=False,
+            error=f"安全限制 (SSRF 防御)：{exc.detail}",
+        )
+
     if not clean_base.endswith("/models"):
         if clean_base.endswith("/v1"):
             url = f"{clean_base}/models"
@@ -174,7 +228,7 @@ async def probe_vllm_models(
         headers["Authorization"] = f"Bearer {api_key.strip()}"
 
     try:
-        async with httpx.AsyncClient(timeout=timeout) as client:
+        async with get_ssrf_safe_async_client(timeout=timeout, trusted_hosts=trusted_hosts) as client:
             resp = await client.get(url, headers=headers)
             if resp.status_code != 200:
                 # Try fallback without /v1
@@ -189,6 +243,11 @@ async def probe_vllm_models(
             raw_models = data.get("data", [])
             model_names = [m.get("id") for m in raw_models if m.get("id")]
             return VLLMProbeResponse(success=True, models=model_names)
+    except SSRFBlockedException as exc:
+        return VLLMProbeResponse(
+            success=False,
+            error=f"安全限制 (SSRF 防御)：{exc.detail}",
+        )
     except httpx.ConnectError:
         return VLLMProbeResponse(
             success=False,

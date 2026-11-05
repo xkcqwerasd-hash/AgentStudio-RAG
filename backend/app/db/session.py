@@ -134,11 +134,13 @@ async def init_db() -> None:
 
         await conn.run_sync(_migrate_schema_columns)
 
-    # Ensure default local user exists for local mode compatibility
-    async with async_session_factory() as session:
-        from app.core.auth import get_or_create_local_user
-        import logging
-        try:
-            await get_or_create_local_user(session)
-        except Exception as e:
-            logging.getLogger(__name__).warning("Initial local user setup note: %s", e)
+    # Ensure default local user exists ONLY for local mode compatibility
+    # In server mode, usr_local_default must NOT be unconditionally created or exposed.
+    if settings.DEPLOYMENT_MODE == "local":
+        async with async_session_factory() as session:
+            from app.core.auth import get_or_create_local_user
+            import logging
+            try:
+                await get_or_create_local_user(session)
+            except Exception as e:
+                logging.getLogger(__name__).warning("Initial local user setup note: %s", e)

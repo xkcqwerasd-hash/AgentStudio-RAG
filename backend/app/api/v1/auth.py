@@ -42,7 +42,17 @@ async def get_auth_mode():
 
 
 # Process-level lock to prevent race condition during registration
-_registration_lock = asyncio.Lock()
+_registration_locks: dict = {}
+
+
+def _get_registration_lock() -> asyncio.Lock:
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+    if loop not in _registration_locks:
+        _registration_locks[loop] = asyncio.Lock()
+    return _registration_locks[loop]
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -85,7 +95,7 @@ async def register(
                 detail=f"Email '{norm_email}' is already registered.",
             )
 
-    async with _registration_lock:
+    async with _get_registration_lock():
         role = UserRole.USER
         if settings.AUTO_FIRST_USER_ADMIN:
             count_stmt = select(func.count(User.id))

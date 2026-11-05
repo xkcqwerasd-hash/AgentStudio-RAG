@@ -1,5 +1,6 @@
 import asyncio
 from pathlib import Path
+import socket
 from typing import AsyncGenerator
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -15,6 +16,17 @@ from app.main import app
 settings.LLM_PROVIDER = "test_double"
 settings.EMBEDDING_PROVIDER = "test_double"
 settings.MEMORY_SIMILARITY_THRESHOLD = 0.25
+
+# Deterministic offline DNS mapping for external provider test domains
+# Prevents host environment VPN/TUN Fake-IP (198.18.0.0/15) from interfering with Server mode unit tests.
+_real_getaddrinfo = socket.getaddrinfo
+
+def _deterministic_test_getaddrinfo(host, port, *args, **kwargs):
+    if host in ("api.openai.com", "api.deepseek.com", "api.siliconflow.cn", "api.alice-ai.corp", "api.dev.corp"):
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", port or 443))]
+    return _real_getaddrinfo(host, port, *args, **kwargs)
+
+socket.getaddrinfo = _deterministic_test_getaddrinfo
 
 # Use in-memory SQLite for tests
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -49,6 +61,7 @@ async def setup_test_db():
     yield
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+    await test_engine.dispose()
 
 
 @pytest.fixture

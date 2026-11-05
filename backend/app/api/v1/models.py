@@ -1,15 +1,18 @@
+import asyncio
 import json
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select, update
+from sqlalchemy import select, update, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_db
 from app.core.auth import get_current_user
+from app.core.config import settings
 from app.core.exceptions import AgentStudioException
 from app.core.logging import logger
 from app.core.security import decrypt_api_key, encrypt_api_key, mask_api_key
+from app.core.ssrf import SSRFBlockedException, validate_url_ssrf
 from app.llm.factory import seed_default_models_if_empty
 from app.llm.manager import probe_ollama_models, probe_vllm_models, test_model_connectivity
 from app.models.model_provider import ModelConfig, ModelProvider
@@ -32,6 +35,71 @@ from app.schemas.model_provider import (
 )
 
 router = APIRouter(prefix="/models", tags=["Model Management"])
+
+_process_locks: dict = {}
+
+
+def _get_process_lock(owner_id: Optional[str]) -> asyncio.Lock:
+    """In-process lock to serialize coroutines within the same worker's event loop."""
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+    key = (loop, owner_id)
+    if key not in _process_locks:
+        _process_locks[key] = asyncio.Lock()
+    return _process_locks[key]
+
+
+async def _acquire_model_default_lock(db: AsyncSession, owner_id: Optional[str]) -> None:
+    """
+    Acquire database-level transaction lock to enforce default model uniqueness
+    across multiple Uvicorn workers and processes.
+    - PostgreSQL:
+      Uses transaction-level advisory locks via pg_advisory_xact_lock(hashtext(:key)).
+      Independent lock keys for system public models ('model_default_system_public')
+      and tenant-specific models ('model_default_tenant_<owner_id>').
+      Locks are held until the active transaction commits or rolls back.
+      If owner_id is provided, also locks the User row (SELECT ... FOR UPDATE).
+    - SQLite:
+      SQLite automatically serializes write transactions across processes.
+    """
+    bind = db.bind or db.get_bind()
+    dialect_name = bind.dialect.name if bind else ""
+
+    if dialect_name == "postgresql":
+        lock_key = f"model_default_{owner_id if owner_id else '__system_public__'}"
+        await db.execute(
+            text("SELECT pg_advisory_xact_lock(hashtext(:key))"),
+            {"key": lock_key},
+        )
+        if owner_id:
+            await db.execute(
+                select(User.id).where(User.id == owner_id).with_for_update()
+            )
+
+
+async def _clear_other_defaults(db: AsyncSession, owner_id: Optional[str]) -> None:
+    """
+    Clear is_default flag scoped strictly to the model owner.
+    - If owner_id is None: clears only across system public models.
+    - If owner_id is not None: clears only across this specific user's private models.
+    Guarantees User A setting a default never modifies User B's defaults or system defaults.
+    """
+    if owner_id is not None:
+        subq = select(ModelProvider.id).where(ModelProvider.owner_id == owner_id)
+        await db.execute(
+            update(ModelConfig)
+            .where(ModelConfig.provider_id.in_(subq))
+            .values(is_default=False)
+        )
+    else:
+        subq = select(ModelProvider.id).where(ModelProvider.owner_id.is_(None))
+        await db.execute(
+            update(ModelConfig)
+            .where(ModelConfig.provider_id.in_(subq))
+            .values(is_default=False)
+        )
 
 
 def _to_provider_response(provider: ModelProvider) -> ModelProviderResponse:
@@ -110,11 +178,16 @@ async def create_provider(
     else:
         target_owner_id = current_user.id
 
+    # SSRF protection: validate provider base_url before persisting to database
+    is_admin = (current_user.role == "admin")
+    trusted_hosts = settings.trusted_internal_hosts_set if (target_owner_id is None and is_admin) else None
+    clean_base_url, _ = validate_url_ssrf(payload.base_url, trusted_hosts=trusted_hosts)
+
     encrypted_key = encrypt_api_key(payload.api_key) if payload.api_key else None
     provider = ModelProvider(
         name=payload.name.strip(),
         provider_type=payload.provider_type.strip(),
-        base_url=payload.base_url.strip().rstrip("/"),
+        base_url=clean_base_url.rstrip("/"),
         api_key_ciphertext=encrypted_key,
         enabled=payload.enabled,
         owner_id=target_owner_id,
@@ -125,8 +198,9 @@ async def create_provider(
     if payload.models:
         for m in payload.models:
             if m.is_default:
-                # Clear other defaults
-                await db.execute(update(ModelConfig).values(is_default=False))
+                # Lock and clear other defaults scoped to target_owner_id
+                await _acquire_model_default_lock(db, target_owner_id)
+                await _clear_other_defaults(db, target_owner_id)
 
             caps = m.capabilities.model_dump() if m.capabilities else {
                 "supports_streaming": True,
@@ -192,7 +266,11 @@ async def update_provider(
     if payload.provider_type is not None:
         provider.provider_type = payload.provider_type.strip()
     if payload.base_url is not None:
-        provider.base_url = payload.base_url.strip().rstrip("/")
+        is_admin = (current_user.role == "admin")
+        is_system_public = (provider.owner_id is None)
+        trusted_hosts = settings.trusted_internal_hosts_set if (is_system_public and is_admin) else None
+        clean_base_url, _ = validate_url_ssrf(payload.base_url, trusted_hosts=trusted_hosts)
+        provider.base_url = clean_base_url.rstrip("/")
     if payload.enabled is not None:
         provider.enabled = payload.enabled
 
@@ -255,7 +333,8 @@ async def create_model_config(
         raise HTTPException(status_code=404, detail="服务商不存在")
 
     if payload.is_default:
-        await db.execute(update(ModelConfig).values(is_default=False))
+        await _acquire_model_default_lock(db, provider.owner_id)
+        await _clear_other_defaults(db, provider.owner_id)
 
     caps = payload.capabilities.model_dump() if payload.capabilities else {
         "supports_streaming": True,
@@ -322,12 +401,16 @@ async def update_model_config(
         cfg.capabilities = payload.capabilities.model_dump()
 
     if payload.is_default is True:
-        await db.execute(update(ModelConfig).values(is_default=False))
-        cfg.is_default = True
+        async with _get_process_lock(prov.owner_id):
+            await _acquire_model_default_lock(db, prov.owner_id)
+            await _clear_other_defaults(db, prov.owner_id)
+            cfg.is_default = True
+            await db.commit()
     elif payload.is_default is False:
         cfg.is_default = False
-
-    await db.commit()
+        await db.commit()
+    else:
+        await db.commit()
     await db.refresh(cfg)
 
     return ModelConfigResponse(
@@ -374,21 +457,36 @@ async def set_default_model(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Set a model as the system default model (Admin only)."""
-    if current_user.role != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="只有管理员可以设置系统默认模型")
-
-    stmt = select(ModelConfig).where(ModelConfig.id == model_id)
+    """
+    Set a model as default model.
+    - System public models (owner_id is None): Admin only.
+    - User private models (owner_id == current_user.id): Owner can set their own default.
+    - Clears default status ONLY for models belonging to the same owner scope.
+    """
+    stmt = select(ModelConfig).options(selectinload(ModelConfig.provider)).where(ModelConfig.id == model_id)
     res = await db.execute(stmt)
     cfg = res.scalar_one_or_none()
     if not cfg:
         raise HTTPException(status_code=404, detail="模型配置不存在")
 
-    await db.execute(update(ModelConfig).values(is_default=False))
-    cfg.is_default = True
-    cfg.enabled = True  # Default model must be enabled
-    await db.commit()
-    await db.refresh(cfg)
+    prov = cfg.provider
+    if not prov:
+        raise HTTPException(status_code=404, detail="服务商不存在")
+
+    if prov.owner_id is None:
+        if current_user.role != "admin":
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="只有管理员可以设置系统默认模型")
+    else:
+        if prov.owner_id != current_user.id and current_user.role != "admin":
+            raise HTTPException(status_code=404, detail="模型配置不存在")
+
+    async with _get_process_lock(prov.owner_id):
+        await _acquire_model_default_lock(db, prov.owner_id)
+        await _clear_other_defaults(db, prov.owner_id)
+        cfg.is_default = True
+        cfg.enabled = True  # Default model must be enabled
+        await db.commit()
+        await db.refresh(cfg)
 
     return ModelConfigResponse(
         id=cfg.id,
@@ -411,13 +509,13 @@ async def list_active_models(
 ):
     """
     Get lightweight flat list of active enabled models for ChatPage model switcher.
+    Scoped to models accessible to current_user (public models + user private models).
+    Prioritizes user's own private default model if set.
     """
     await seed_default_models_if_empty(db)
 
-    if current_user.role == "admin":
-        provider_filter = True
-    else:
-        provider_filter = (ModelProvider.owner_id.is_(None)) | (ModelProvider.owner_id == current_user.id)
+    # Scoped: user can only see system public models or their own private models
+    provider_filter = (ModelProvider.owner_id.is_(None)) | (ModelProvider.owner_id == current_user.id)
 
     stmt = (
         select(ModelConfig, ModelProvider)
@@ -432,8 +530,19 @@ async def list_active_models(
     res = await db.execute(stmt)
     rows = res.all()
 
+    # Determine if user has a private default
+    has_user_default = any(
+        cfg.is_default and prov.owner_id == current_user.id
+        for cfg, prov in rows
+    )
+
     items: List[ActiveModelItem] = []
     for cfg, prov in rows:
+        if has_user_default:
+            effective_default = bool(cfg.is_default and prov.owner_id == current_user.id)
+        else:
+            effective_default = bool(cfg.is_default and prov.owner_id is None)
+
         items.append(
             ActiveModelItem(
                 id=cfg.id,
@@ -442,7 +551,7 @@ async def list_active_models(
                 provider_type=prov.provider_type,
                 model_name=cfg.model_name,
                 display_name=cfg.display_name,
-                is_default=cfg.is_default,
+                is_default=effective_default,
                 capabilities=ModelCapabilities(**cfg.capabilities),
             )
         )
@@ -523,21 +632,36 @@ async def test_connection(
             error="缺少测试参数：必须提供 Base URL 和 模型名称 (Model Name)。",
         )
 
+    trusted_hosts = settings.trusted_internal_hosts_set if current_user.role == "admin" else None
     return await test_model_connectivity(
         base_url=base_url,
         api_key=api_key,
         model_name=model_name,
         timeout=15.0,
+        trusted_hosts=trusted_hosts,
     )
 
 
 @router.post("/probe/ollama", response_model=OllamaProbeResponse)
-async def probe_ollama(payload: OllamaProbeRequest):
-    """Probe installed models on a local Ollama server."""
-    return await probe_ollama_models(base_url=payload.base_url, timeout=10.0)
+async def probe_ollama(
+    payload: OllamaProbeRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """Probe installed models on a local Ollama server (Requires authentication)."""
+    trusted_hosts = settings.trusted_internal_hosts_set if current_user.role == "admin" else None
+    return await probe_ollama_models(base_url=payload.base_url, timeout=10.0, trusted_hosts=trusted_hosts)
 
 
 @router.post("/probe/vllm", response_model=VLLMProbeResponse)
-async def probe_vllm(payload: VLLMProbeRequest):
-    """Probe hosted models on a vLLM server."""
-    return await probe_vllm_models(base_url=payload.base_url, api_key=payload.api_key, timeout=10.0)
+async def probe_vllm(
+    payload: VLLMProbeRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """Probe hosted models on a vLLM server (Requires authentication)."""
+    trusted_hosts = settings.trusted_internal_hosts_set if current_user.role == "admin" else None
+    return await probe_vllm_models(
+        base_url=payload.base_url,
+        api_key=payload.api_key,
+        timeout=10.0,
+        trusted_hosts=trusted_hosts,
+    )

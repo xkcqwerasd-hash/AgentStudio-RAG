@@ -8,6 +8,7 @@ import numpy as np
 from app.core.config import settings
 from app.core.exceptions import EmbeddingServiceError
 from app.core.logging import logger
+from app.core.ssrf import SSRFBlockedException, get_ssrf_safe_async_client
 from app.llm.base import BaseEmbeddingClient
 
 # Suppress jieba log output
@@ -252,7 +253,11 @@ class OpenAIEmbeddingClient(BaseEmbeddingClient):
         }
 
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with get_ssrf_safe_async_client(
+                timeout=30.0,
+                allow_local=(settings.DEPLOYMENT_MODE == "local"),
+                trusted_hosts=settings.trusted_internal_hosts_set,
+            ) as client:
                 resp = await client.post(url, json=payload, headers=headers)
                 if resp.status_code != 200:
                     # Never log raw headers or full API key
@@ -266,9 +271,13 @@ class OpenAIEmbeddingClient(BaseEmbeddingClient):
                 for v in vecs:
                     validate_vector(v, self._dimension, self._provider_name, self._model)
                 return vecs
+        except SSRFBlockedException as exc:
+            raise EmbeddingServiceError(
+                f"Embedding request blocked by security policy (SSRF): {exc.detail}"
+            ) from exc
         except (httpx.ConnectError, httpx.TimeoutException) as exc:
             raise EmbeddingServiceError(
-                f"Embedding API connection failed to '{self._base_url}': {exc}"
+                f"Embedding service connection failed to '{self._base_url}': {exc}"
             ) from exc
         except EmbeddingServiceError:
             raise

@@ -2,12 +2,13 @@ import asyncio
 import json
 import re
 import uuid
-from typing import Any, AsyncIterator, Dict, List, Optional, Union
+from typing import Any, AsyncIterator, Dict, List, Optional, Set, Union
 import httpx
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage, ToolMessage
 
 from app.core.config import settings
 from app.core.exceptions import LLMNotConfiguredError
+from app.core.ssrf import SSRFBlockedException, get_ssrf_safe_async_client
 from app.llm.base import BaseLLMClient
 
 
@@ -72,11 +73,17 @@ class OpenAILLMClient(BaseLLMClient):
         api_key: Optional[str] = None,
         base_url: Optional[str] = None,
         model: Optional[str] = None,
+        timeout: float = 60.0,
+        allow_local: Optional[bool] = None,
+        trusted_hosts: Optional[Set[str]] = None,
     ):
         self.api_key = api_key if api_key is not None else settings.OPENAI_API_KEY
         self.base_url = (base_url or settings.OPENAI_BASE_URL).rstrip("/")
         self.model = model or settings.LLM_MODEL
+        self.timeout = timeout
         self.last_usage: Optional[dict] = None
+        self.allow_local = (settings.DEPLOYMENT_MODE == "local") if allow_local is None else allow_local
+        self.trusted_hosts = trusted_hosts
 
     async def generate(
         self,
@@ -110,17 +117,23 @@ class OpenAILLMClient(BaseLLMClient):
         }
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with get_ssrf_safe_async_client(
+                timeout=self.timeout,
+                allow_local=self.allow_local,
+                trusted_hosts=self.trusted_hosts,
+            ) as client:
                 resp = await client.post(url, json=payload, headers=headers)
                 if resp.status_code != 200:
                     raise RuntimeError(f"LLM API returned HTTP {resp.status_code}: {resp.text}")
                 data = resp.json()
                 self.last_usage = data.get("usage")
                 return data["choices"][0]["message"]["content"]
+        except SSRFBlockedException as exc:
+            raise RuntimeError(f"SSRF 安全策略拦截: {exc.detail}") from exc
         except httpx.ConnectError as exc:
             raise RuntimeError(f"Failed to connect to LLM provider at {self.base_url}: {exc}") from exc
         except httpx.TimeoutException as exc:
-            raise RuntimeError(f"LLM call timed out after 60s: {exc}") from exc
+            raise RuntimeError(f"LLM call timed out after {self.timeout}s: {exc}") from exc
 
     async def generate_stream(
         self,
@@ -156,7 +169,11 @@ class OpenAILLMClient(BaseLLMClient):
         self.last_usage = None
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with get_ssrf_safe_async_client(
+                timeout=self.timeout,
+                allow_local=self.allow_local,
+                trusted_hosts=self.trusted_hosts,
+            ) as client:
                 async with client.stream("POST", url, json=payload, headers=headers) as resp:
                     if resp.status_code != 200:
                         err_text = await resp.aread()
@@ -183,10 +200,12 @@ class OpenAILLMClient(BaseLLMClient):
                                         yield content
                             except json.JSONDecodeError:
                                 continue
+        except SSRFBlockedException as exc:
+            raise RuntimeError(f"SSRF 安全策略拦截: {exc.detail}") from exc
         except httpx.ConnectError as exc:
             raise RuntimeError(f"Failed to connect to LLM provider at {self.base_url}: {exc}") from exc
         except httpx.TimeoutException as exc:
-            raise RuntimeError(f"LLM streaming call timed out after 60s: {exc}") from exc
+            raise RuntimeError(f"LLM streaming call timed out after {self.timeout}s: {exc}") from exc
 
     async def generate_with_tools(
         self,
@@ -219,7 +238,11 @@ class OpenAILLMClient(BaseLLMClient):
             payload["tool_choice"] = tool_choice
 
         try:
-            async with httpx.AsyncClient(timeout=60.0) as client:
+            async with get_ssrf_safe_async_client(
+                timeout=self.timeout,
+                allow_local=self.allow_local,
+                trusted_hosts=self.trusted_hosts,
+            ) as client:
                 resp = await client.post(url, json=payload, headers=headers)
                 if resp.status_code != 200:
                     raise RuntimeError(f"LLM API returned HTTP {resp.status_code}: {resp.text}")
@@ -270,10 +293,12 @@ class OpenAILLMClient(BaseLLMClient):
                         "model": data.get("model", self.model),
                     },
                 )
+        except SSRFBlockedException as exc:
+            raise RuntimeError(f"SSRF 安全策略拦截: {exc.detail}") from exc
         except httpx.ConnectError as exc:
             raise RuntimeError(f"Failed to connect to LLM provider at {self.base_url}: {exc}") from exc
         except httpx.TimeoutException as exc:
-            raise RuntimeError(f"LLM call timed out after 60s: {exc}") from exc
+            raise RuntimeError(f"LLM call timed out after {self.timeout}s: {exc}") from exc
 
 
 class TestDoubleLLMClient(BaseLLMClient):

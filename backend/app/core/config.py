@@ -1,5 +1,7 @@
+import math
+from collections import Counter
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal, Optional, Set
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -38,6 +40,14 @@ class Settings(BaseSettings):
     AUTO_FIRST_USER_ADMIN: bool = True
     PASSWORD_HASH_ITERATIONS: int = 600_000
     ALLOW_TEST_USER_OVERRIDE: bool = False
+    # Explicit whitelist of internal host:port or hostnames allowed for system public model services in Server mode
+    SERVER_TRUSTED_INTERNAL_HOSTS: str = ""
+
+    @property
+    def trusted_internal_hosts_set(self) -> Set[str]:
+        if not self.SERVER_TRUSTED_INTERNAL_HOSTS:
+            return set()
+        return {h.strip().lower() for h in self.SERVER_TRUSTED_INTERNAL_HOSTS.split(",") if h.strip()}
 
     # Database & Storage
     # Default to SQLite for zero-configuration instant local running, or postgresql+asyncpg://...
@@ -135,6 +145,109 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+INSECURE_SECRET_SUBSTRINGS = (
+    "agentstudio_server_secret_key_change_in_production",
+    "change_in_production",
+    "change_me",
+    "placeholder",
+    "example",
+    "your_secret",
+    "default_secret",
+    "secret_key",
+    "replace_with",
+    "12345678",
+)
+
+
+def calculate_shannon_entropy(data: str) -> float:
+    """Calculate the Shannon entropy of a string in bits per character."""
+    if not data:
+        return 0.0
+    counts = Counter(data)
+    total = len(data)
+    return -sum((count / total) * math.log2(count / total) for count in counts.values())
+
+
+def validate_server_security_settings(cfg: Optional[Settings] = None) -> None:
+    """
+    Application-level security audit for Server deployment mode.
+    Enforces that production server deployments cannot start with default,
+    placeholder, or weak secrets.
+    """
+    conf = cfg or settings
+    if conf.DEPLOYMENT_MODE == "server":
+        secret = (conf.SERVER_AUTH_SECRET or "").strip()
+        if not secret:
+            raise RuntimeError(
+                "Security Check Failed: SERVER_AUTH_SECRET cannot be empty in 'server' deployment mode. "
+                "Please configure a cryptographically secure secret (minimum 32 characters, "
+                "recommendation: generate via secrets.token_urlsafe(32))."
+            )
+
+        if secret == "agentstudio_server_secret_key_change_in_production":
+            raise RuntimeError(
+                "Security Check Failed: In Server deployment mode, SERVER_AUTH_SECRET must be explicitly configured "
+                "and cannot use the default development key. "
+                "Generate one via: python -c 'import secrets; print(secrets.token_urlsafe(32))'"
+            )
+
+        if len(secret) < 32:
+            raise RuntimeError(
+                f"Security Check Failed: SERVER_AUTH_SECRET is too short ({len(secret)} chars). "
+                "Server deployment mode requires a cryptographically strong secret of at least 32 characters "
+                "(recommendation: generate via secrets.token_urlsafe(32))."
+            )
+
+        lower_secret = secret.lower()
+        for placeholder in INSECURE_SECRET_SUBSTRINGS:
+            if placeholder in lower_secret:
+                raise RuntimeError(
+                    f"Security Check Failed: SERVER_AUTH_SECRET contains insecure placeholder or default '{placeholder}'. "
+                    "Server deployment mode requires a dedicated, randomly generated secret."
+                )
+
+        # Check for repetitive substring patterns (e.g. "abab...", "12341234...", "passpass...")
+        for chunk_len in range(1, 9):
+            if len(secret) >= chunk_len * 3:
+                prefix = secret[:chunk_len]
+                repeated = prefix * (len(secret) // chunk_len)
+                if secret.startswith(repeated) and len(repeated) >= len(secret) - chunk_len:
+                    raise RuntimeError(
+                        f"Security Check Failed: SERVER_AUTH_SECRET contains repetitive sequence '{prefix}'. "
+                        "Please use a cryptographically random secret."
+                    )
+
+        # Check for predictable alphanumeric / keyboard runs
+        predictable_runs = [
+            "abcdefghijklmnopqrstuvwxyz",
+            "01234567890123456789",
+            "qwertyuiopasdfghjklzxcvbnm",
+        ]
+        for run in predictable_runs:
+            if run[:16] in lower_secret:
+                raise RuntimeError(
+                    f"Security Check Failed: SERVER_AUTH_SECRET contains predictable pattern '{run[:16]}...'. "
+                    "Please use a truly random string."
+                )
+
+        # Calculate true Shannon entropy (bits per character)
+        entropy = calculate_shannon_entropy(secret)
+        if entropy < 3.2:
+            raise RuntimeError(
+                f"Security Check Failed: SERVER_AUTH_SECRET has low Shannon entropy ({entropy:.2f} bits/char < 3.20). "
+                "Please generate a truly random secret, e.g. via secrets.token_urlsafe(32)."
+            )
+
+        # Check MODEL_ENCRYPTION_KEY if provided
+        if conf.MODEL_ENCRYPTION_KEY:
+            enc_key = conf.MODEL_ENCRYPTION_KEY.strip().lower()
+            for placeholder in ("change_me", "placeholder", "example", "default", "12345678"):
+                if placeholder in enc_key:
+                    raise RuntimeError(
+                        f"Security Check Failed: MODEL_ENCRYPTION_KEY contains insecure placeholder '{placeholder}'."
+                    )
+
 
 # Ensure directories exist
 settings.STORAGE_DIR.mkdir(parents=True, exist_ok=True)

@@ -2,6 +2,7 @@ import json
 from typing import Optional, Tuple
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
 from app.core.exceptions import AgentStudioException
@@ -111,6 +112,7 @@ async def resolve_llm_client(
     if model_id:
         stmt = (
             select(ModelConfig)
+            .options(selectinload(ModelConfig.provider))
             .where(ModelConfig.id == model_id)
         )
         res = await db.execute(stmt)
@@ -121,29 +123,83 @@ async def resolve_llm_client(
             raise ModelDisabledError(f"指定的模型配置 [{model_cfg.display_name}] 已被停用，请选择其他可用模型。")
 
         # Multi-tenant authorization check: private provider can only be accessed by its owner
-        provider = await db.get(ModelProvider, model_cfg.provider_id)
+        provider = model_cfg.provider
         if provider and provider.owner_id is not None:
-            if user_id is not None and provider.owner_id != user_id:
-                # Disallow unauthorized cross-tenant model usage
+            if user_id is None or provider.owner_id != user_id:
+                # Disallow unauthorized cross-tenant model usage (IDOR protection)
                 raise ModelNotFoundError(model_id)
     else:
-        # Resolve default model
-        stmt = (
-            select(ModelConfig)
-            .where(ModelConfig.is_default == True, ModelConfig.enabled == True)
-            .limit(1)
-        )
-        res = await db.execute(stmt)
-        model_cfg = res.scalar_one_or_none()
+        # Hierarchical model resolution scoped to user identity:
+        # 1. User Private Default: If user_id provided, check if user has set a private default
+        if user_id is not None:
+            user_default_stmt = (
+                select(ModelConfig)
+                .join(ModelProvider, ModelConfig.provider_id == ModelProvider.id)
+                .options(selectinload(ModelConfig.provider))
+                .where(
+                    ModelProvider.owner_id == user_id,
+                    ModelConfig.is_default == True,
+                    ModelConfig.enabled == True,
+                    ModelProvider.enabled == True,
+                )
+                .limit(1)
+            )
+            res = await db.execute(user_default_stmt)
+            model_cfg = res.scalar_one_or_none()
 
+        # 2. System Public Default: If no private default, resolve system public default
         if not model_cfg:
-            # Fall back to any enabled model
-            fallback_stmt = select(ModelConfig).where(ModelConfig.enabled == True).limit(1)
-            fallback_res = await db.execute(fallback_stmt)
-            model_cfg = fallback_res.scalar_one_or_none()
+            sys_default_stmt = (
+                select(ModelConfig)
+                .join(ModelProvider, ModelConfig.provider_id == ModelProvider.id)
+                .options(selectinload(ModelConfig.provider))
+                .where(
+                    ModelProvider.owner_id.is_(None),
+                    ModelConfig.is_default == True,
+                    ModelConfig.enabled == True,
+                    ModelProvider.enabled == True,
+                )
+                .limit(1)
+            )
+            res = await db.execute(sys_default_stmt)
+            model_cfg = res.scalar_one_or_none()
 
+        # 3. User-Accessible Fallback: Any accessible enabled model for this user
         if not model_cfg:
-            # Seed default from environment settings
+            # 3a. Try any user private enabled model
+            if user_id is not None:
+                priv_fallback_stmt = (
+                    select(ModelConfig)
+                    .join(ModelProvider, ModelConfig.provider_id == ModelProvider.id)
+                    .options(selectinload(ModelConfig.provider))
+                    .where(
+                        ModelProvider.owner_id == user_id,
+                        ModelConfig.enabled == True,
+                        ModelProvider.enabled == True,
+                    )
+                    .limit(1)
+                )
+                res = await db.execute(priv_fallback_stmt)
+                model_cfg = res.scalar_one_or_none()
+
+            # 3b. Try any system public enabled model
+            if not model_cfg:
+                pub_fallback_stmt = (
+                    select(ModelConfig)
+                    .join(ModelProvider, ModelConfig.provider_id == ModelProvider.id)
+                    .options(selectinload(ModelConfig.provider))
+                    .where(
+                        ModelProvider.owner_id.is_(None),
+                        ModelConfig.enabled == True,
+                        ModelProvider.enabled == True,
+                    )
+                    .limit(1)
+                )
+                res = await db.execute(pub_fallback_stmt)
+                model_cfg = res.scalar_one_or_none()
+
+        # 4. If DB has no models at all, seed default system public model
+        if not model_cfg:
             model_cfg = await seed_default_models_if_empty(db)
 
     # If still no model in DB (e.g. in test doubles without committing), create mock virtual ModelConfig
@@ -201,11 +257,15 @@ async def resolve_llm_client(
 
     base_url = (provider.base_url if provider else settings.OPENAI_BASE_URL)
 
-    # Create request-isolated LLM client
+    # Create request-isolated LLM client equipped with SSRF policy parameters
+    is_system_public = bool(provider and provider.owner_id is None)
+    trusted_hosts = settings.trusted_internal_hosts_set if is_system_public else None
     client = OpenAILLMClient(
         api_key=plain_api_key,
         base_url=base_url,
         model=model_cfg.model_name,
+        allow_local=(settings.DEPLOYMENT_MODE == "local"),
+        trusted_hosts=trusted_hosts,
     )
     return client, model_cfg
 

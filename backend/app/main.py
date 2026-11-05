@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.v1.api_router import api_v1_router
-from app.core.config import settings
+from app.core.config import settings, validate_server_security_settings
 from app.core.exceptions import AgentStudioException
 from app.core.logging import logger, setup_logging
 from app.db.session import init_db
@@ -14,6 +14,8 @@ from app.db.session import init_db
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
+    # Application-level startup security audit
+    validate_server_security_settings(settings)
     if not os.getenv("SKIP_LIFESPAN_DB_INIT"):
         logger.info("Initializing AgentStudio-RAG Database schema...")
         await init_db()
