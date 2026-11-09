@@ -3,6 +3,32 @@ from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
+def clean_and_parse_json(raw: Any) -> Any:
+    """
+    Cleans and parses a JSON string, robustly stripping markdown codeblocks
+    (e.g. ```json ... ``` or ``` ... ```) and whitespace.
+    If raw is already a dict or list, returns it directly.
+    Raises json.JSONDecodeError if invalid JSON.
+    """
+    if isinstance(raw, (dict, list)):
+        return raw
+    if not isinstance(raw, str):
+        return raw
+
+    s = raw.strip()
+    if s.startswith("```"):
+        lines = s.splitlines()
+        # Drop opening fence line if it starts with ```
+        if len(lines) >= 2 and lines[0].startswith("```"):
+            lines = lines[1:]
+        # Drop closing fence line if it starts with ```
+        if lines and lines[-1].strip().startswith("```"):
+            lines = lines[:-1]
+        s = "\n".join(lines).strip()
+
+    return json.loads(s)
+
+
 class ToolResult(BaseModel):
     """
     Standardized result emitted by any tool execution.
@@ -12,6 +38,7 @@ class ToolResult(BaseModel):
     success: bool
     data: Optional[Any] = None
     error: Optional[str] = None
+    error_type: Optional[str] = None
     duration_ms: float = 0.0
     metadata: Dict[str, Any] = Field(default_factory=dict)
 

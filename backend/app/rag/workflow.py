@@ -983,15 +983,46 @@ class WorkflowRAGEngine:
             )
             gen_start = time.perf_counter()
 
-            async for token in self.llm_client.generate_stream(
-                prompt=user_prompt,
-                system_prompt=self.prompt_builder.system_prompt,
-                temperature=req.temperature,
-            ):
-                if ttft_ms is None:
-                    ttft_ms = round((time.perf_counter() - gen_start) * 1000, 2)
-                accumulated_answer += token
-                yield {"event": "token", "data": {"delta": token}}
+            # Dynamic Token budget calculation (GEN-11 fix)
+            planned_output_tokens = None
+            if plan and hasattr(plan, "budget_info") and plan.budget_info:
+                planned_output_tokens = getattr(plan.budget_info, "reserved_output_tokens", None)
+
+            if planned_output_tokens is not None and planned_output_tokens > 0:
+                effective_max_tokens = min(planned_output_tokens, settings.MAX_OUTPUT_TOKENS)
+            else:
+                effective_max_tokens = settings.LLM_MAX_TOKENS
+
+            stream_meta: Dict[str, Any] = {
+                "completed": False,
+                "finish_reason": None,
+                "is_truncated": False,
+                "generation_status": "unknown",
+                "usage": None,
+                "reasoning_tokens": None,
+                "error": None,
+            }
+
+            try:
+                async for token in self.llm_client.generate_stream(
+                    prompt=user_prompt,
+                    system_prompt=self.prompt_builder.system_prompt,
+                    temperature=req.temperature,
+                    max_tokens=effective_max_tokens,
+                    response_metadata=stream_meta,
+                ):
+                    if ttft_ms is None:
+                        ttft_ms = round((time.perf_counter() - gen_start) * 1000, 2)
+                    accumulated_answer += token
+                    yield {"event": "token", "data": {"delta": token}}
+            except Exception as stream_exc:
+                logger.warning(f"RAG streaming interrupted or encountered error: {stream_exc}")
+                if not stream_meta.get("error"):
+                    stream_meta["error"] = str(stream_exc)
+                if stream_meta.get("generation_status") in ("unknown", "completed"):
+                    stream_meta["generation_status"] = "interrupted"
+                if not accumulated_answer:
+                    raise
 
             # 7. Post-processing: Citation extraction and DB persistence
             gen_duration = (time.perf_counter() - gen_start) * 1000
@@ -1001,9 +1032,30 @@ class WorkflowRAGEngine:
             output_tokens = self.budget_manager.estimator.estimate(accumulated_answer)
             actual_input_tokens = plan.budget_info.actual_input_tokens
             actual_output_tokens = output_tokens
-            if hasattr(self.llm_client, "last_usage") and self.llm_client.last_usage:
+
+            stream_usage = stream_meta.get("usage")
+            if stream_usage:
+                actual_input_tokens = stream_usage.get("prompt_tokens", actual_input_tokens)
+                actual_output_tokens = stream_usage.get("completion_tokens", output_tokens)
+            elif hasattr(self.llm_client, "last_usage") and self.llm_client.last_usage:
                 actual_input_tokens = self.llm_client.last_usage.get("prompt_tokens")
                 actual_output_tokens = self.llm_client.last_usage.get("completion_tokens", output_tokens)
+
+            finish_reason = stream_meta.get("finish_reason")
+            is_truncated = stream_meta.get("is_truncated", False)
+            if finish_reason == "length":
+                is_truncated = True
+
+            generation_status = stream_meta.get("generation_status")
+            if not generation_status or generation_status == "unknown":
+                if not stream_meta.get("completed"):
+                    generation_status = "unknown"
+                elif is_truncated:
+                    generation_status = "truncated"
+                else:
+                    generation_status = "completed"
+
+            reasoning_tokens = stream_meta.get("reasoning_tokens")
 
             # Calculate attachment chunks retained in final plan
             att_chunks_kept_count = len([
@@ -1062,6 +1114,10 @@ class WorkflowRAGEngine:
                 injected_memory_count=mem_res.injected_count,
                 memory_tokens=mem_res.used_memory_tokens,
                 memory_retrieval_duration_ms=mem_res.duration_ms,
+                finish_reason=finish_reason,
+                is_truncated=is_truncated,
+                generation_status=generation_status,
+                reasoning_tokens=reasoning_tokens,
             )
 
             assistant_msg = Message(
@@ -1170,6 +1226,10 @@ class WorkflowRAGEngine:
                 attachment_tokens=att_result.used_tokens if att_result else 0,
                 attachment_chunks_kept=att_chunks_kept_count,
                 attachment_chunks_pruned=att_result.chunks_pruned if att_result else 0,
+                finish_reason="cancelled",
+                is_truncated=False,
+                generation_status="interrupted",
+                reasoning_tokens=stream_meta.get("reasoning_tokens") if "stream_meta" in locals() else None,
             )
             assistant_msg = Message(
                 conversation_id=conv_id,

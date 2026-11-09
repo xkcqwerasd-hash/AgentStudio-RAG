@@ -111,6 +111,11 @@ class ExecutionInfo(BaseModel):
     injected_memory_count: int = Field(default=0, description="实际注入上下文的长期记忆条数")
     memory_tokens: int = Field(default=0, description="长期记忆消耗的Token数")
     memory_retrieval_duration_ms: Optional[float] = Field(default=None, description="记忆检索耗时(ms)")
+    # GEN-11 Streaming Hardening additions
+    finish_reason: Optional[str] = Field(default=None, description="LLM生成结束原因: stop / length / content_filter / error")
+    is_truncated: bool = Field(default=False, description="生成是否因Token上限截断")
+    generation_status: Optional[str] = Field(default="completed", description="生成最终状态: completed / truncated / interrupted / failed / unknown")
+    reasoning_tokens: Optional[int] = Field(default=None, description="官方Usage返回的思考过程Token消耗")
 
 
 class ChatRequest(BaseModel):

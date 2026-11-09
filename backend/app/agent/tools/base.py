@@ -68,6 +68,54 @@ class BaseTool(ABC):
             },
         }
 
+    def _format_validation_error(self, val_err: ValidationError) -> str:
+        """
+        Generate human/LLM-friendly structured validation error message:
+        1. Distinguishes missing required fields, type mismatches, and value errors.
+        2. Omits raw Python stack traces and does not dump raw input values (preventing secret leak).
+        3. Appends clean parameter schema contract derived automatically from Pydantic model.
+        """
+        schema = self.args_schema.model_json_schema()
+        properties = schema.get("properties", {})
+        required_fields = set(schema.get("required", []))
+
+        missing_fields = []
+        type_errors = []
+        other_errors = []
+
+        for err in val_err.errors():
+            loc = ".".join(str(x) for x in err.get("loc", []))
+            err_type = err.get("type", "")
+            msg = err.get("msg", "")
+
+            if err_type == "missing" or "required" in msg.lower():
+                missing_fields.append(loc)
+            elif "type" in err_type or "parsing" in err_type:
+                expected_type = properties.get(loc, {}).get("type", "unknown")
+                type_errors.append(f"字段 '{loc}' 类型不符（期望类型: {expected_type}）")
+            else:
+                other_errors.append(f"字段 '{loc}' 校验失败: {msg}")
+
+        lines = [f"Invalid arguments for tool '{self.name}' (参数校验失败)："]
+        if missing_fields:
+            lines.append(f"- 缺少必填参数: {', '.join(missing_fields)}")
+        for te in type_errors:
+            lines.append(f"- {te}")
+        for oe in other_errors:
+            lines.append(f"- {oe}")
+
+        lines.append("【参数定义规范】:")
+        for prop_name, prop_meta in properties.items():
+            p_type = prop_meta.get("type", "any")
+            p_req = "必填" if prop_name in required_fields else "可选"
+            p_desc = prop_meta.get("description", "")
+            p_default = prop_meta.get("default", None)
+            default_str = f", 默认值: {p_default}" if p_default is not None else ""
+            lines.append(f"- {prop_name} ({p_type}, {p_req}{default_str}): {p_desc}")
+
+        lines.append("请依据上述定义提供合法参数。")
+        return "\n".join(lines)
+
     async def run(self, **kwargs) -> ToolResult:
         """
         Standard execution entrypoint:
@@ -82,12 +130,14 @@ class BaseTool(ABC):
             validated = self.args_schema(**kwargs)
         except ValidationError as val_err:
             duration_ms = (time.perf_counter() - start_time) * 1000
-            err_msg = f"Invalid arguments for tool '{self.name}': {val_err.errors()}"
-            logger.warning(err_msg)
+            err_msg = self._format_validation_error(val_err)
+            logger.warning(f"Parameter validation failed for '{self.name}': {err_msg}")
             return ToolResult(
                 tool_name=self.name,
                 success=False,
                 error=err_msg,
+                error_type="param_validation",
+                metadata={"error_type": "param_validation"},
                 duration_ms=round(duration_ms, 2),
             )
         except Exception as exc:
@@ -98,6 +148,8 @@ class BaseTool(ABC):
                 tool_name=self.name,
                 success=False,
                 error=err_msg,
+                error_type="param_validation",
+                metadata={"error_type": "param_validation"},
                 duration_ms=round(duration_ms, 2),
             )
 

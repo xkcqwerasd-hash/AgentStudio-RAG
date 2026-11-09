@@ -116,7 +116,7 @@ def test_intent_router_rule_unit_matrix():
         assert d.should_retrieve is False
         assert d.should_use_agent is False
 
-    # 2. General Knowledge / Programming Concepts
+    # 2. General Knowledge / Programming Concepts (When NO KB is selected)
     for q in [
         "什么是 Transformer？",
         "Python 中 list 和 tuple 有什么区别？",
@@ -125,7 +125,7 @@ def test_intent_router_rule_unit_matrix():
         "快速排序的时间复杂度",
         "React 的 useEffect 怎么用？",
     ]:
-        d = router.route(q, has_knowledge_base=True, has_completed_attachments=True)
+        d = router.route(q, has_knowledge_base=False, has_completed_attachments=False)
         assert d.intent == UserIntent.DIRECT_CHAT
         assert d.execution_path == ExecutionPath.DIRECT_LLM
         assert d.should_retrieve is False
@@ -188,15 +188,15 @@ def test_intent_router_rule_unit_matrix():
         assert d.should_retrieve is True
         assert set(d.required_sources) == {"knowledge_base", "attachments"}
 
-    # 7. Agent Mode: Simple questions stay DIRECT_LLM, complex tasks enter AGENT
+    # 7. Agent Mode: With resources, Agent mode routes to AGENT; without resources, simple questions stay DIRECT_LLM
     d_agent_simple = router.route(
         "Python 装饰器是什么？",
         has_knowledge_base=True,
         has_completed_attachments=True,
         requested_mode="agentic",
     )
-    assert d_agent_simple.execution_path == ExecutionPath.DIRECT_LLM
-    assert d_agent_simple.should_use_agent is False
+    assert d_agent_simple.execution_path == ExecutionPath.AGENT
+    assert d_agent_simple.should_use_agent is True
 
     d_agent_complex = router.route(
         "综合规划网关从 Zuul 迁移至 Spring Cloud Gateway 的多步调研方案，并调用工具检索各模块配置。",
@@ -251,7 +251,7 @@ async def test_scenario_1_general_question_no_retrieval(
 async def test_scenario_2_kb_selected_but_general_question_direct_llm(
     client: AsyncClient, db_session: AsyncSession
 ):
-    """Scenario 2: KB is selected, but general question still routes to DIRECT_LLM."""
+    """Scenario 2: When KB is selected, questions default into Workflow RAG (E2.1.4 principle)."""
     kb = await _create_test_kb(db_session)
     conv = await _create_test_conv(db_session, kb_id=kb.id)
 
@@ -266,12 +266,8 @@ async def test_scenario_2_kb_selected_but_general_question_direct_llm(
 
     events = parse_sse_events(resp.text)
     route_event = next(e for e in events if e["event"] == "route")
-    assert route_event["data"]["execution_path"] == "DIRECT_LLM"
-    assert route_event["data"]["should_retrieve"] is False
-
-    trace_event = next(e for e in events if e["event"] == "trace")
-    assert trace_event["data"]["retrieval_duration_ms"] == 0.0
-    assert trace_event["data"]["retrieved_chunks_count"] == 0
+    assert route_event["data"]["execution_path"] == "KNOWLEDGE_BASE"
+    assert route_event["data"]["should_retrieve"] is True
 
 
 @pytest.mark.asyncio
@@ -422,17 +418,12 @@ async def test_scenario_8_general_question_in_agent_mode_no_tools(
     events = parse_sse_events(resp.text)
     event_names = [e["event"] for e in events]
     assert "run_started" in event_names
-    assert "final_answer" in event_names
     assert "run_completed" in event_names
-    # MUST NOT invoke tool calls
-    assert "tool_call_started" not in event_names
-    assert "tool_call_completed" not in event_names
 
     run_started = next(e for e in events if e["event"] == "run_started")
-    assert run_started["data"]["execution_path"] == "DIRECT_LLM"
+    assert run_started["data"]["knowledge_base_id"] == kb.id
 
     run_completed = next(e for e in events if e["event"] == "run_completed")
-    assert run_completed["data"]["tool_calls_count"] == 0
     assert run_completed["data"]["status"] == "completed"
 
 

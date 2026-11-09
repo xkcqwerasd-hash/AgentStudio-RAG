@@ -30,18 +30,34 @@ def route_agent_decision(
         return "citation_verifier_node"
 
     tool_calls = getattr(last_message, "tool_calls", []) or []
-    if tool_calls:
+    invalid_tool_calls = getattr(last_message, "invalid_tool_calls", []) or []
+    if tool_calls or invalid_tool_calls:
         configurable = (config or {}).get("configurable", {})
         max_steps = configurable.get("max_steps", 5)
         max_tool_calls = configurable.get("max_tool_calls", 10)
+        max_consecutive_param_errors = configurable.get("max_consecutive_param_errors", 2)
+        max_consecutive_duplicate_calls = configurable.get("max_consecutive_duplicate_calls", 2)
+        max_consecutive_json_errors = configurable.get("max_consecutive_json_errors", 2)
 
         curr_steps = state.get("execution_steps", 0)
         curr_tool_calls = state.get("tool_call_count", 0)
+        curr_param_errors = state.get("consecutive_param_errors", 0)
+        curr_duplicate_calls = state.get("consecutive_duplicate_calls", 0)
+        curr_json_errors = state.get("consecutive_json_errors", 0)
 
-        if curr_steps >= max_steps or curr_tool_calls >= max_tool_calls:
+        if (
+            curr_steps >= max_steps
+            or curr_tool_calls >= max_tool_calls
+            or curr_param_errors >= max_consecutive_param_errors
+            or curr_duplicate_calls >= max_consecutive_duplicate_calls
+            or curr_json_errors >= max_consecutive_json_errors
+        ):
             logger.info(
                 f"Agent run reached limit (steps: {curr_steps}/{max_steps}, "
-                f"tool_calls: {curr_tool_calls}/{max_tool_calls}). Routing to force_stop_node."
+                f"tool_calls: {curr_tool_calls}/{max_tool_calls}, "
+                f"param_errors: {curr_param_errors}/{max_consecutive_param_errors}, "
+                f"duplicates: {curr_duplicate_calls}/{max_consecutive_duplicate_calls}, "
+                f"json_errors: {curr_json_errors}/{max_consecutive_json_errors}). Routing to force_stop_node."
             )
             return "force_stop_node"
 

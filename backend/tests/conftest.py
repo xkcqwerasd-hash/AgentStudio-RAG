@@ -49,6 +49,18 @@ from app.db import session as db_session_module
 db_session_module.async_session_factory = test_session_factory
 
 
+@pytest.fixture(autouse=True)
+def reset_test_double_state():
+    """Reset TestDouble mutable state before and after every test to prevent test cross-contamination."""
+    from app.llm.openai_client import get_llm_client, TestDoubleLLMClient
+    client = get_llm_client("test_double")
+    if isinstance(client, TestDoubleLLMClient):
+        client.set_responses([])
+    yield
+    if isinstance(client, TestDoubleLLMClient):
+        client.set_responses([])
+
+
 @pytest.fixture(scope="session")
 def anyio_backend():
     return "asyncio"

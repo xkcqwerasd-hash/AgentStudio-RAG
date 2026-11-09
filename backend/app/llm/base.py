@@ -52,6 +52,7 @@ class BaseLLMClient(ABC):
         system_prompt: Optional[str] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        response_metadata: Optional[Dict[str, Any]] = None,
     ) -> AsyncIterator[str]:
         """Yield incremental token chunks from LLM."""
         pass

@@ -154,8 +154,10 @@ async def _setup_kb_with_doc(
 async def test_scenario_01_agent_without_attachments_runs_normally(db_session: AsyncSession):
     """Scenario 1: Agent runs normally without attachments."""
     kb, _, _ = await _setup_kb_with_doc(db_session)
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -181,8 +183,10 @@ async def test_scenario_02_agent_pure_attachment_qa_no_kb(db_session: AsyncSessi
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -201,8 +205,10 @@ async def test_scenario_02_agent_pure_attachment_qa_no_kb(db_session: AsyncSessi
 async def test_scenario_03_agent_pure_kb_qa_regression(db_session: AsyncSession):
     """Scenario 3: Agent pure KnowledgeBase QA regression."""
     kb, doc, _ = await _setup_kb_with_doc(db_session)
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -232,8 +238,10 @@ async def test_scenario_04_attachment_plus_kb_combined_qa(db_session: AsyncSessi
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     # The prompt explicitly asks for cross-source comparison
@@ -265,8 +273,10 @@ async def test_scenario_05_agent_autonomous_decision_for_attachment_tool(db_sess
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     # Prompt asks about uploaded attachment
@@ -286,8 +296,10 @@ async def test_scenario_06_agent_autonomous_decision_for_kb_tool(db_session: Asy
     kb, _, _ = await _setup_kb_with_doc(db_session)
     conv = await _create_conv(db_session, kb_id=kb.id)
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -315,8 +327,10 @@ async def test_scenario_07_agent_consecutive_two_different_tools(db_session: Asy
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -349,8 +363,10 @@ async def test_scenario_08_multi_attachment_cross_file_retrieval(db_session: Asy
     db_session.add_all([att1, att2])
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -378,8 +394,10 @@ async def test_scenario_09_pdf_page_number_citation(db_session: AsyncSession):
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -415,8 +433,10 @@ async def test_scenario_10_docx_heading_path_citation(db_session: AsyncSession):
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -452,8 +472,10 @@ async def test_scenario_11_markdown_heading_path_citation(db_session: AsyncSessi
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -488,8 +510,10 @@ async def test_scenario_12_txt_line_numbers_citation(db_session: AsyncSession):
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -519,8 +543,10 @@ async def test_scenario_13_attachment_and_kb_ref_strictly_unique(db_session: Asy
     await db_session.commit()
 
     evidence_reg = EvidenceRegistry()
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -584,8 +610,10 @@ async def test_scenario_15_cross_conversation_attachment_isolation(db_session: A
     db_session.add_all([att_a, att_b])
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     state = await runtime.ainvoke(
@@ -795,8 +823,10 @@ async def test_scenario_22_client_cancellation_and_clean_state(db_session: Async
     db_session.add(att)
     await db_session.commit()
 
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
 
@@ -962,8 +992,10 @@ async def test_scenario_27_multi_turn_agent_context_continuity(client: AsyncClie
 async def test_scenario_28_original_m4_1_runtime_capabilities_regression(db_session: AsyncSession):
     """Scenario 28: Original M4.1 Runtime capabilities regression (direct answer, step limits, tool isolation)."""
     kb, _, _ = await _setup_kb_with_doc(db_session)
+    llm = TestDoubleLLMClient()
     runtime = LangGraphAgentRuntime(
         tool_registry=get_default_tool_registry(),
+        llm_client=llm,
         db_session=db_session,
     )
     # Direct answer without tools

@@ -95,6 +95,20 @@ class IntentRouter:
         q = (query or "").strip()
         q_lower = q.lower()
 
+        # ----------------------------------------------------------------------
+        # 0. Explicit Direct Chat Mode -> DIRECT_LLM
+        # ----------------------------------------------------------------------
+        if requested_mode == "direct":
+            return RouteDecision(
+                intent=UserIntent.DIRECT_CHAT,
+                execution_path=ExecutionPath.DIRECT_LLM,
+                required_sources=[],
+                reason="用户显式选择直接对话模式 (mode='direct')，无需外部检索",
+                should_retrieve=False,
+                should_use_agent=False,
+                confidence=1.0,
+            )
+
         # Check explicit indicators first
         explicit_kb = any(p.search(q_lower) for p in self.KB_PATTERNS)
         explicit_att = any(p.search(q_lower) for p in self.ATT_PATTERNS)
@@ -131,14 +145,14 @@ class IntentRouter:
             )
 
         # ----------------------------------------------------------------------
-        # 3. Missing Attachment Degrade -> DIRECT_LLM
+        # 3. Missing Attachment Degrade -> DIRECT_LLM (Only when no KB is bound)
         # ----------------------------------------------------------------------
-        if explicit_att and not has_completed_attachments:
+        if not has_knowledge_base and explicit_att and not has_completed_attachments:
             return RouteDecision(
                 intent=UserIntent.DIRECT_CHAT,
                 execution_path=ExecutionPath.DIRECT_LLM,
                 required_sources=[],
-                reason="用户提问提及附件但当前会话未上传可用附件，降级为大模型直接回答并友好提示",
+                reason="用户提问提及附件但当前会话未上传可用附件，请先上传附件后再针对附件提问，避免直接编造答案",
                 should_retrieve=False,
                 should_use_agent=False,
                 confidence=0.90,
@@ -146,18 +160,20 @@ class IntentRouter:
 
         # ----------------------------------------------------------------------
         # 4. Pure Generic Technical Concept / Programming -> DIRECT_LLM
+        # (Only applied when NO knowledge base is bound. When KB is bound, default to RAG)
         # ----------------------------------------------------------------------
-        is_generic_tech = any(p.search(q_lower) for p in self.GENERIC_TECH_PATTERNS)
-        if is_generic_tech and not explicit_kb and not explicit_att:
-            return RouteDecision(
-                intent=UserIntent.DIRECT_CHAT,
-                execution_path=ExecutionPath.DIRECT_LLM,
-                required_sources=[],
-                reason="通用技术概念/编程语言/基础算法常识问答，无需外部检索，直接由大模型回答",
-                should_retrieve=False,
-                should_use_agent=False,
-                confidence=0.95,
-            )
+        if not has_knowledge_base:
+            is_generic_tech = any(p.search(q_lower) for p in self.GENERIC_TECH_PATTERNS)
+            if is_generic_tech and not explicit_kb and not explicit_att:
+                return RouteDecision(
+                    intent=UserIntent.DIRECT_CHAT,
+                    execution_path=ExecutionPath.DIRECT_LLM,
+                    required_sources=[],
+                    reason="未选择知识库且属于通用技术概念/编程语言/基础算法常识问答，无需外部检索，直接由大模型回答",
+                    should_retrieve=False,
+                    should_use_agent=False,
+                    confidence=0.95,
+                )
 
         # ----------------------------------------------------------------------
         # 5. Complex Agent Task (When requested_mode == 'agentic')

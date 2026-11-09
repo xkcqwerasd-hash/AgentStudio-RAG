@@ -27,6 +27,10 @@ class AgentState(TypedDict):
     # 4. Step & tool execution counters
     execution_steps: int
     tool_call_count: int
+    consecutive_param_errors: int
+    consecutive_duplicate_calls: int
+    consecutive_json_errors: int
+    executed_tool_fingerprints: List[str]
 
     # 5. Runtime lifecycle status & diagnostics
     # "running" | "completed" | "failed" | "timeout" | "cancelled" | "max_steps_reached"

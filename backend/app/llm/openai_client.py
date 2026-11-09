@@ -1,11 +1,13 @@
 import asyncio
 import json
+import os
 import re
 import uuid
 from typing import Any, AsyncIterator, Dict, List, Optional, Set, Union
 import httpx
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage, ToolMessage
 
+from app.agent.tools.schemas import clean_and_parse_json
 from app.core.config import settings
 from app.core.exceptions import LLMNotConfiguredError
 from app.core.ssrf import SSRFBlockedException, get_ssrf_safe_async_client
@@ -38,10 +40,15 @@ def messages_to_openai_payload(
                 entry["tool_call_id"] = getattr(m, "tool_call_id", "")
             elif role == "assistant":
                 entry["content"] = m.content if m.content else None
-                tool_calls = getattr(m, "tool_calls", None)
-                if tool_calls:
+                tool_calls = getattr(m, "tool_calls", None) or []
+                invalid_tool_calls = getattr(m, "invalid_tool_calls", None) or []
+                if tool_calls or invalid_tool_calls:
                     raw_tcs = []
                     for tc in tool_calls:
+                        tc_id = tc.get("id")
+                        if not tc_id:
+                            tc_id = f"call_{uuid.uuid4().hex[:8]}"
+                            tc["id"] = tc_id
                         args = tc.get("args", {})
                         arg_str = (
                             json.dumps(args, ensure_ascii=False)
@@ -49,10 +56,25 @@ def messages_to_openai_payload(
                             else str(args)
                         )
                         raw_tcs.append({
-                            "id": tc.get("id") or f"call_{uuid.uuid4().hex[:8]}",
+                            "id": tc_id,
                             "type": "function",
                             "function": {
                                 "name": tc.get("name"),
+                                "arguments": arg_str,
+                            },
+                        })
+                    for itc in invalid_tool_calls:
+                        itc_id = itc.get("id")
+                        if not itc_id:
+                            itc_id = f"invalid_{uuid.uuid4().hex[:8]}"
+                            itc["id"] = itc_id
+                        raw_args = itc.get("args", "{}")
+                        arg_str = str(raw_args) if raw_args is not None else "{}"
+                        raw_tcs.append({
+                            "id": itc_id,
+                            "type": "function",
+                            "function": {
+                                "name": itc.get("name"),
                                 "arguments": arg_str,
                             },
                         })
@@ -82,6 +104,7 @@ class OpenAILLMClient(BaseLLMClient):
         self.model = model or settings.LLM_MODEL
         self.timeout = timeout
         self.last_usage: Optional[dict] = None
+        self.last_payload: Optional[dict] = None
         self.allow_local = (settings.DEPLOYMENT_MODE == "local") if allow_local is None else allow_local
         self.trusted_hosts = trusted_hosts
 
@@ -115,6 +138,7 @@ class OpenAILLMClient(BaseLLMClient):
             "temperature": temperature if temperature is not None else settings.LLM_TEMPERATURE,
             "max_tokens": max_tokens or settings.LLM_MAX_TOKENS,
         }
+        self.last_payload = payload
 
         try:
             async with get_ssrf_safe_async_client(
@@ -141,6 +165,7 @@ class OpenAILLMClient(BaseLLMClient):
         system_prompt: Optional[str] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        response_metadata: Optional[Dict[str, Any]] = None,
     ) -> AsyncIterator[str]:
         if not self.api_key and not self.base_url.startswith("http://localhost"):
             raise LLMNotConfiguredError(
@@ -158,15 +183,26 @@ class OpenAILLMClient(BaseLLMClient):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
+        effective_max_tokens = max_tokens or settings.LLM_MAX_TOKENS
         payload = {
             "model": self.model,
             "messages": messages,
             "temperature": temperature if temperature is not None else settings.LLM_TEMPERATURE,
-            "max_tokens": max_tokens or settings.LLM_MAX_TOKENS,
+            "max_tokens": effective_max_tokens,
             "stream": True,
             "stream_options": {"include_usage": True},
         }
+        self.last_payload = payload
         self.last_usage = None
+
+        meta = response_metadata if response_metadata is not None else {}
+        meta.setdefault("completed", False)
+        meta.setdefault("finish_reason", None)
+        meta.setdefault("is_truncated", False)
+        meta.setdefault("generation_status", "unknown")
+        meta.setdefault("usage", None)
+        meta.setdefault("reasoning_tokens", None)
+        meta.setdefault("error", None)
 
         try:
             async with get_ssrf_safe_async_client(
@@ -177,9 +213,11 @@ class OpenAILLMClient(BaseLLMClient):
                 async with client.stream("POST", url, json=payload, headers=headers) as resp:
                     if resp.status_code != 200:
                         err_text = await resp.aread()
-                        raise RuntimeError(
-                            f"LLM API returned HTTP {resp.status_code}: {err_text.decode('utf-8', errors='replace')}"
-                        )
+                        err_msg = f"LLM API returned HTTP {resp.status_code}: {err_text.decode('utf-8', errors='replace')}"
+                        meta["error"] = err_msg
+                        meta["generation_status"] = "failed"
+                        raise RuntimeError(err_msg)
+
                     async for line in resp.aiter_lines():
                         if not line:
                             continue
@@ -187,25 +225,67 @@ class OpenAILLMClient(BaseLLMClient):
                         if line.startswith("data: "):
                             data_str = line[6:].strip()
                             if data_str == "[DONE]":
+                                meta["completed"] = True
+                                if meta["generation_status"] == "unknown":
+                                    if meta.get("finish_reason") == "stop":
+                                        meta["generation_status"] = "completed"
+                                    elif meta.get("finish_reason") == "length":
+                                        meta["generation_status"] = "truncated"
+                                    elif meta.get("finish_reason") == "content_filter":
+                                        meta["generation_status"] = "content_filter"
+                                    else:
+                                        meta["generation_status"] = "completed"
                                 break
                             try:
                                 chunk = json.loads(data_str)
                                 if "usage" in chunk and chunk["usage"]:
                                     self.last_usage = chunk["usage"]
+                                    meta["usage"] = chunk["usage"]
+                                    tokens_details = chunk["usage"].get("completion_tokens_details") or {}
+                                    reasoning_tokens = tokens_details.get("reasoning_tokens") or chunk["usage"].get("reasoning_tokens")
+                                    if reasoning_tokens is not None:
+                                        meta["reasoning_tokens"] = int(reasoning_tokens)
+
                                 choices = chunk.get("choices", [])
                                 if choices:
-                                    delta = choices[0].get("delta", {})
+                                    choice = choices[0]
+                                    fr = choice.get("finish_reason")
+                                    if fr:
+                                        meta["finish_reason"] = fr
+                                        if fr == "length":
+                                            meta["is_truncated"] = True
+                                            meta["generation_status"] = "truncated"
+                                        elif fr == "stop":
+                                            meta["generation_status"] = "completed"
+                                        elif fr == "content_filter":
+                                            meta["generation_status"] = "content_filter"
+                                        else:
+                                            meta["generation_status"] = fr
+
+                                    delta = choice.get("delta", {})
                                     content = delta.get("content")
                                     if content:
                                         yield content
                             except json.JSONDecodeError:
                                 continue
         except SSRFBlockedException as exc:
+            meta["error"] = f"SSRF 安全策略拦截: {exc.detail}"
+            meta["generation_status"] = "failed"
             raise RuntimeError(f"SSRF 安全策略拦截: {exc.detail}") from exc
         except httpx.ConnectError as exc:
+            meta["error"] = str(exc)
+            meta["generation_status"] = "interrupted"
             raise RuntimeError(f"Failed to connect to LLM provider at {self.base_url}: {exc}") from exc
         except httpx.TimeoutException as exc:
+            meta["error"] = str(exc)
+            meta["generation_status"] = "interrupted"
             raise RuntimeError(f"LLM streaming call timed out after {self.timeout}s: {exc}") from exc
+        except Exception as exc:
+            if not meta.get("error"):
+                meta["error"] = str(exc)
+            if meta.get("generation_status") == "unknown":
+                meta["generation_status"] = "interrupted"
+            raise
 
     async def generate_with_tools(
         self,
@@ -263,7 +343,7 @@ class OpenAILLMClient(BaseLLMClient):
                     raw_args = fn.get("arguments", "{}")
                     try:
                         parsed_args = (
-                            json.loads(raw_args)
+                            clean_and_parse_json(raw_args)
                             if isinstance(raw_args, str)
                             else raw_args
                         )
@@ -312,6 +392,35 @@ class TestDoubleLLMClient(BaseLLMClient):
     def __init__(self, model: Optional[str] = None, scripted_responses: Optional[List[Any]] = None):
         self.model: str = model or settings.LLM_MODEL
         self._scripted_responses: List[Union[AIMessage, Exception]] = list(scripted_responses) if scripted_responses else []
+        self.last_usage: Optional[dict] = None
+        self.last_max_tokens: Optional[int] = None
+        self.last_payload: Optional[dict] = None
+        self._stream_simulation: Optional[Dict[str, Any]] = None
+
+    def set_stream_simulation(
+        self,
+        chunks: Optional[List[str]] = None,
+        finish_reason: str = "stop",
+        usage: Optional[dict] = None,
+        error: Optional[Exception] = None,
+        fail_after_chunk: Optional[int] = None,
+        omit_done: bool = False,
+    ) -> None:
+        """Configure deterministic stream simulation for testing."""
+        if chunks is None and usage is None and error is None and finish_reason == "stop":
+            self._stream_simulation = None
+        else:
+            self._stream_simulation = {
+                "chunks": chunks or [],
+                "finish_reason": finish_reason,
+                "usage": usage,
+                "error": error,
+                "fail_after_chunk": fail_after_chunk,
+                "omit_done": omit_done,
+            }
+
+    def clear_stream_simulation(self) -> None:
+        self._stream_simulation = None
 
     def set_responses(self, responses: List[Union[AIMessage, Exception]]) -> None:
         """Queue scripted responses or exceptions for deterministic testing."""
@@ -630,17 +739,94 @@ class TestDoubleLLMClient(BaseLLMClient):
         system_prompt: Optional[str] = None,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
+        response_metadata: Optional[Dict[str, Any]] = None,
     ) -> AsyncIterator[str]:
+        effective_max_tokens = max_tokens or settings.LLM_MAX_TOKENS
+        self.last_max_tokens = effective_max_tokens
+        self.last_payload = {
+            "model": self.model,
+            "prompt": prompt,
+            "system_prompt": system_prompt,
+            "max_tokens": effective_max_tokens,
+            "temperature": temperature,
+        }
+
+        meta = response_metadata if response_metadata is not None else {}
+        meta.setdefault("completed", False)
+        meta.setdefault("finish_reason", None)
+        meta.setdefault("is_truncated", False)
+        meta.setdefault("generation_status", "unknown")
+        meta.setdefault("usage", None)
+        meta.setdefault("reasoning_tokens", None)
+        meta.setdefault("error", None)
+
+        if hasattr(self, "_stream_simulation") and self._stream_simulation:
+            sim = self._stream_simulation
+            chunks = sim.get("chunks", [])
+            finish_reason = sim.get("finish_reason", "stop")
+            sim_usage = sim.get("usage")
+            sim_error = sim.get("error")
+            fail_after_chunk = sim.get("fail_after_chunk")
+            omit_done = sim.get("omit_done", False)
+
+            for idx, ch in enumerate(chunks):
+                if fail_after_chunk is not None and idx >= fail_after_chunk:
+                    err = sim_error or RuntimeError("Simulated network stream disconnection")
+                    meta["error"] = str(err)
+                    meta["generation_status"] = "interrupted"
+                    raise err
+                if ch:
+                    yield ch
+                await asyncio.sleep(0.001)
+
+            if sim_usage:
+                self.last_usage = sim_usage
+                meta["usage"] = sim_usage
+                tokens_details = sim_usage.get("completion_tokens_details") or {}
+                rt = tokens_details.get("reasoning_tokens") or sim_usage.get("reasoning_tokens")
+                if rt is not None:
+                    meta["reasoning_tokens"] = int(rt)
+
+            meta["finish_reason"] = finish_reason
+            if finish_reason == "length":
+                meta["is_truncated"] = True
+                meta["generation_status"] = "truncated"
+            elif finish_reason == "stop":
+                meta["generation_status"] = "completed"
+            elif finish_reason == "content_filter":
+                meta["generation_status"] = "content_filter"
+            else:
+                meta["generation_status"] = finish_reason
+
+            if not omit_done:
+                meta["completed"] = True
+            else:
+                meta["completed"] = False
+                if meta["generation_status"] == "completed":
+                    meta["generation_status"] = "unknown"
+            return
+
         full_text = await self.generate(
             prompt=prompt,
             system_prompt=system_prompt,
             temperature=temperature,
-            max_tokens=max_tokens,
+            max_tokens=effective_max_tokens,
         )
         chunk_size = 4
         for i in range(0, len(full_text), chunk_size):
             yield full_text[i : i + chunk_size]
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.005)
+
+        meta["finish_reason"] = "stop"
+        meta["is_truncated"] = False
+        meta["completed"] = True
+        meta["generation_status"] = "completed"
+        meta["usage"] = {
+            "prompt_tokens": len(prompt) // 4,
+            "completion_tokens": len(full_text) // 4,
+            "total_tokens": (len(prompt) + len(full_text)) // 4,
+        }
+        self.last_usage = meta["usage"]
 
 
 _test_double_singleton: Optional[TestDoubleLLMClient] = None
@@ -648,6 +834,11 @@ _test_double_singleton: Optional[TestDoubleLLMClient] = None
 
 def get_llm_client(provider: Optional[str] = None) -> BaseLLMClient:
     p = provider or settings.LLM_PROVIDER
+    if "PYTEST_CURRENT_TEST" in os.environ and p == "openai":
+        raise RuntimeError(
+            "External live LLM API access via get_llm_client('openai') is strictly prohibited in test environment. "
+            "Tests must explicitly inject TestDoubleLLMClient or set settings.LLM_PROVIDER='test_double'."
+        )
     if p == "test_double":
         global _test_double_singleton
         if _test_double_singleton is None:

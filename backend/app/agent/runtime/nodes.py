@@ -1,6 +1,7 @@
 import asyncio
 import json
 import time
+import uuid
 from typing import Any, Dict, List, Optional
 from langchain_core.messages import (
     AIMessage,
@@ -13,10 +14,34 @@ from langchain_core.runnables import RunnableConfig
 from app.agent.runtime.state import AgentState
 from app.agent.tools.evidence import EvidenceRegistry
 from app.agent.tools.registry import ToolRegistry
-from app.agent.tools.schemas import ToolResult
+from app.agent.tools.schemas import ToolResult, clean_and_parse_json
 from app.core.logging import logger
 from app.llm.base import BaseLLMClient
 from app.rag.citation import CitationExtractor
+
+
+def compute_tool_fingerprint(tool_name: str, args: Any) -> str:
+    """
+    Compute a deterministic canonical fingerprint for a tool call.
+    1. Handles dict, stringified JSON, or raw arguments (including markdown codeblocks).
+    2. Sorts dict keys, strips string whitespace, and ignores None values.
+    """
+    if isinstance(args, str):
+        try:
+            args = clean_and_parse_json(args)
+        except Exception:
+            return f"{tool_name}:{args.strip()}"
+
+    if not isinstance(args, dict):
+        return f"{tool_name}:{str(args)}"
+
+    clean_args = {
+        k: (v.strip() if isinstance(v, str) else v)
+        for k, v in args.items()
+        if v is not None
+    }
+    canonical_json = json.dumps(clean_args, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return f"{tool_name}:{canonical_json}"
 
 
 async def agent_node(state: AgentState, config: Optional[RunnableConfig] = None) -> Dict[str, Any]:
@@ -34,8 +59,14 @@ async def agent_node(state: AgentState, config: Optional[RunnableConfig] = None)
 
     curr_steps = state.get("execution_steps", 0)
     curr_tool_calls = state.get("tool_call_count", 0)
+    curr_param_errors = state.get("consecutive_param_errors", 0)
+    curr_duplicate_calls = state.get("consecutive_duplicate_calls", 0)
+    curr_json_errors = state.get("consecutive_json_errors", 0)
     max_steps = configurable.get("max_steps", 5)
     max_tool_calls = configurable.get("max_tool_calls", 10)
+    max_consecutive_param_errors = configurable.get("max_consecutive_param_errors", 2)
+    max_consecutive_duplicate_calls = configurable.get("max_consecutive_duplicate_calls", 2)
+    max_consecutive_json_errors = configurable.get("max_consecutive_json_errors", 2)
 
     # Filter enabled tools schema
     enabled_tools = state.get("enabled_tools", [])
@@ -44,8 +75,15 @@ async def agent_node(state: AgentState, config: Optional[RunnableConfig] = None)
         t for t in all_tool_schemas if t.get("function", {}).get("name") in enabled_tools
     ]
 
-    # If steps or calls already reached limit, do not pass tools
-    tools_param = allowed_tools if (curr_steps < max_steps and curr_tool_calls < max_tool_calls) else None
+    # If steps, calls, param errors, duplicate calls, or json errors reached limit, do not pass tools
+    tools_allowed = (
+        curr_steps < max_steps
+        and curr_tool_calls < max_tool_calls
+        and curr_param_errors < max_consecutive_param_errors
+        and curr_duplicate_calls < max_consecutive_duplicate_calls
+        and curr_json_errors < max_consecutive_json_errors
+    )
+    tools_param = allowed_tools if tools_allowed else None
 
     start_t = time.perf_counter()
     try:
@@ -77,12 +115,15 @@ async def agent_node(state: AgentState, config: Optional[RunnableConfig] = None)
     next_step = curr_steps + 1
 
     tool_calls = getattr(ai_message, "tool_calls", []) or []
-    if tool_calls:
+    invalid_tool_calls = getattr(ai_message, "invalid_tool_calls", []) or []
+    all_calls = tool_calls + invalid_tool_calls
+    if all_calls:
         trace = {
             "event": "agent_tool_decision",
             "step": next_step,
-            "tool_calls_count": len(tool_calls),
-            "tools": [tc.get("name") for tc in tool_calls],
+            "tool_calls_count": len(all_calls),
+            "tools": [tc.get("name") for tc in all_calls],
+            "invalid_tool_calls_count": len(invalid_tool_calls),
             "duration_ms": duration_ms,
             "timestamp": time.time(),
         }
@@ -116,9 +157,18 @@ async def tool_node(state: AgentState, config: Optional[RunnableConfig] = None) 
     evidence_registry: EvidenceRegistry = configurable["evidence_registry"]
     db_session = configurable.get("db_session")
     tool_timeout: float = configurable.get("tool_timeout", 30.0)
+    max_consecutive_param_errors: int = configurable.get("max_consecutive_param_errors", 2)
+    max_consecutive_duplicate_calls: int = configurable.get("max_consecutive_duplicate_calls", 2)
+    max_consecutive_json_errors: int = configurable.get("max_consecutive_json_errors", 2)
+
+    curr_consecutive_param_errors: int = state.get("consecutive_param_errors", 0)
+    curr_consecutive_duplicate_calls: int = state.get("consecutive_duplicate_calls", 0)
+    curr_consecutive_json_errors: int = state.get("consecutive_json_errors", 0)
+    executed_fps: List[str] = list(state.get("executed_tool_fingerprints", []))
 
     last_message = state["messages"][-1] if state.get("messages") else None
     tool_calls = getattr(last_message, "tool_calls", []) or []
+    invalid_tool_calls = getattr(last_message, "invalid_tool_calls", []) or []
 
     enabled_tools = set(state.get("enabled_tools", []))
     trusted_kb_id = state.get("knowledge_base_id")
@@ -127,13 +177,56 @@ async def tool_node(state: AgentState, config: Optional[RunnableConfig] = None) 
     traces: List[Dict[str, Any]] = list(state.get("trace_events", []))
     curr_tool_call_count = state.get("tool_call_count", 0)
 
+    # 1. Process valid tool_calls
     for tc in tool_calls:
-        tc_id = tc.get("id") or f"call_{time.time_ns()}"
+        tc_id = tc.get("id")
+        if not tc_id:
+            tc_id = f"call_{uuid.uuid4().hex[:8]}"
+            tc["id"] = tc_id
         tool_name = tc.get("name", "")
         raw_args = tc.get("args", {})
+
+        # P0-1, P0-2 & P0-3 Guard: If limits reached, block remaining
+        if (
+            curr_consecutive_param_errors >= max_consecutive_param_errors
+            or curr_consecutive_duplicate_calls >= max_consecutive_duplicate_calls
+            or curr_consecutive_json_errors >= max_consecutive_json_errors
+        ):
+            if curr_consecutive_param_errors >= max_consecutive_param_errors:
+                reason_msg = "consecutive parameter error limit"
+                limit_val = max_consecutive_param_errors
+            elif curr_consecutive_duplicate_calls >= max_consecutive_duplicate_calls:
+                reason_msg = "consecutive duplicate call limit"
+                limit_val = max_consecutive_duplicate_calls
+            else:
+                reason_msg = "consecutive JSON parse error limit"
+                limit_val = max_consecutive_json_errors
+
+            err_msg = (
+                f"Execution blocked: Tool '{tool_name}' was not executed because the {reason_msg} ({limit_val}) has been reached."
+            )
+            logger.warning(err_msg)
+            tool_messages.append(
+                ToolMessage(
+                    content=json.dumps({"status": "blocked", "tool_name": tool_name, "error": err_msg}, ensure_ascii=False),
+                    tool_call_id=tc_id,
+                    name=tool_name,
+                )
+            )
+            curr_tool_call_count += 1
+            traces.append({
+                "event": "tool_execution_blocked",
+                "tool_name": tool_name,
+                "tool_call_id": tc_id,
+                "reason": f"{reason_msg}_reached",
+                "error": err_msg,
+                "timestamp": time.time(),
+            })
+            continue
+
         if isinstance(raw_args, str):
             try:
-                raw_args = json.loads(raw_args)
+                raw_args = clean_and_parse_json(raw_args)
             except Exception as j_err:
                 err_msg = f"Tool arguments JSON parse error: {j_err}"
                 tool_messages.append(
@@ -144,7 +237,19 @@ async def tool_node(state: AgentState, config: Optional[RunnableConfig] = None) 
                     )
                 )
                 curr_tool_call_count += 1
+                curr_consecutive_json_errors += 1
+                traces.append({
+                    "event": "tool_arguments_json_error",
+                    "tool_name": tool_name,
+                    "tool_call_id": tc_id,
+                    "error": err_msg,
+                    "timestamp": time.time(),
+                })
                 continue
+
+        # If arguments parsed successfully and no invalid_tool_calls in this turn, reset JSON error counter
+        if not invalid_tool_calls:
+            curr_consecutive_json_errors = 0
 
         # Security Check 1: Tool permission whitelist
         if tool_name not in enabled_tools:
@@ -185,6 +290,13 @@ async def tool_node(state: AgentState, config: Optional[RunnableConfig] = None) 
                 )
             )
             curr_tool_call_count += 1
+            traces.append({
+                "event": "tool_not_registered",
+                "tool_name": tool_name,
+                "tool_call_id": tc_id,
+                "error": err_msg,
+                "timestamp": time.time(),
+            })
             continue
 
         # Attach Run-scoped dependencies if supported
@@ -196,6 +308,37 @@ async def tool_node(state: AgentState, config: Optional[RunnableConfig] = None) 
             tool_instance = tool_instance.with_conversation_id(trusted_conv_id)
         if hasattr(tool_instance, "with_user_id") and state.get("user_id"):
             tool_instance = tool_instance.with_user_id(state["user_id"])
+
+        # P0-2: Duplicate Call Detection & Anti-Oscillation
+        fp = compute_tool_fingerprint(tool_name, raw_args)
+        if fp in executed_fps:
+            curr_consecutive_duplicate_calls += 1
+            err_msg = (
+                f"检测到重复工具调用：工具 '{tool_name}' 已在当前任务中使用完全相同的参数执行过并返回结果。"
+                f"请勿重复发起相同的工具调用，请直接根据已有检索信息作答，或调整检索参数（如关键词、过滤条件）后重试。"
+            )
+            logger.warning(f"Duplicate tool call blocked: {fp} (count={curr_consecutive_duplicate_calls})")
+            tool_messages.append(
+                ToolMessage(
+                    content=json.dumps({"status": "duplicate_blocked", "tool_name": tool_name, "error": err_msg}, ensure_ascii=False),
+                    tool_call_id=tc_id,
+                    name=tool_name,
+                )
+            )
+            curr_tool_call_count += 1
+            traces.append({
+                "event": "tool_duplicate_blocked",
+                "tool_name": tool_name,
+                "tool_call_id": tc_id,
+                "fingerprint": fp,
+                "consecutive_duplicate_calls": curr_consecutive_duplicate_calls,
+                "error": err_msg,
+                "timestamp": time.time(),
+            })
+            continue
+        else:
+            # Model made a new non-duplicate call, reset consecutive duplicates count
+            curr_consecutive_duplicate_calls = 0
 
         # Timed execution with cancellation preservation
         start_t = time.perf_counter()
@@ -240,6 +383,21 @@ async def tool_node(state: AgentState, config: Optional[RunnableConfig] = None) 
         )
         curr_tool_call_count += 1
 
+        # P0-1: Update consecutive parameter error counter
+        # Counter ONLY increments on Pydantic ValidationError (error_type == 'param_validation').
+        # Any successful Schema validation (even if _run raises execution exception or times out) resets it to 0.
+        is_param_val_error = (
+            getattr(tool_result, "error_type", None) == "param_validation"
+            or tool_result.metadata.get("error_type") == "param_validation"
+        )
+        if is_param_val_error:
+            curr_consecutive_param_errors += 1
+        else:
+            curr_consecutive_param_errors = 0
+            # P0-2: Record successfully validated tool call fingerprint for anti-oscillation
+            if fp not in executed_fps:
+                executed_fps.append(fp)
+
         res_data = tool_result.data if isinstance(tool_result.data, dict) else {}
         source_type = res_data.get("source_type") or (
             "knowledge_base" if "knowledge_base" in tool_name else (
@@ -265,12 +423,46 @@ async def tool_node(state: AgentState, config: Optional[RunnableConfig] = None) 
             "timestamp": time.time(),
         })
 
+    # 2. Process invalid_tool_calls (malformed JSON from LLM)
+    if invalid_tool_calls:
+        curr_consecutive_json_errors += 1
+        for itc in invalid_tool_calls:
+            tc_id = itc.get("id")
+            if not tc_id:
+                tc_id = f"invalid_{uuid.uuid4().hex[:8]}"
+                itc["id"] = tc_id
+            tool_name = itc.get("name", "")
+            raw_args = itc.get("args")
+            err = itc.get("error") or "Malformed JSON arguments"
+            err_msg = f"Tool arguments JSON parse error: {err}. Please format tool arguments as valid JSON."
+            logger.warning(f"Invalid tool call received for '{tool_name}' ({tc_id}): {err}")
+            tool_messages.append(
+                ToolMessage(
+                    content=json.dumps({"status": "error", "tool_name": tool_name, "error": err_msg}, ensure_ascii=False),
+                    tool_call_id=tc_id,
+                    name=tool_name,
+                )
+            )
+            curr_tool_call_count += 1
+            traces.append({
+                "event": "tool_malformed_json_error",
+                "tool_name": tool_name,
+                "tool_call_id": tc_id,
+                "raw_args": str(raw_args)[:200] if raw_args is not None else "",
+                "error": err_msg,
+                "timestamp": time.time(),
+            })
+
     # Sync Run-scoped evidence
     updated_evidence = [e.model_dump() for e in evidence_registry.get_all_evidence_items()]
 
     return {
         "messages": tool_messages,
         "tool_call_count": curr_tool_call_count,
+        "consecutive_param_errors": curr_consecutive_param_errors,
+        "consecutive_duplicate_calls": curr_consecutive_duplicate_calls,
+        "consecutive_json_errors": curr_consecutive_json_errors,
+        "executed_tool_fingerprints": executed_fps,
         "evidence": updated_evidence,
         "trace_events": traces,
     }
