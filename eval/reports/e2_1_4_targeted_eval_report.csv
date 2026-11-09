@@ -1,0 +1,11 @@
+id,category,answerable,correctness_score,faithfulness_score,citation_accuracy_score,relevancy_score,rejection_detected,client_ttft_ms,server_ttft_ms,retrieval_ms,generation_ms,total_ms,input_tokens,output_tokens
+GEN-09,single_fact,True,5,5,5,5,False,4971.21,2583.14,,,5152.88,1037,146
+GEN-10,single_fact,True,5,5,5,4,False,4292.14,2621.45,,,5851.51,1056,423
+GEN-13,multi_hop,True,3,4,4,3,False,15069.25,13357.18,,,16327.99,1168,2048
+GEN-15,multi_hop,True,5,5,5,5,True,6536.74,4788.01,,,9513.25,1072,1126
+GEN-26,unanswerable,False,5,5,5,5,True,4344.54,2657.2,,,5740.19,1075,405
+GEN-30,unanswerable,False,5,5,5,5,True,4426.9,2761.91,,,6918.72,1098,477
+GEN-17,multi_hop,True,5,5,5,5,False,4675.21,2887.28,,,5780.22,1066,449
+GEN-22,parametric,True,1,5,5,2,False,4608.09,2860.53,,,5831.81,1042,448
+GEN-24,parametric,True,1,5,5,4,True,4390.8,2757.96,,,6225.59,1200,508
+GEN-14,multi_hop,True,4,5,5,5,False,6019.05,4167.51,,,7952.96,1218,590

@@ -1,0 +1,1296 @@
+{
+  "summary": {
+    "timestamp": "2026-11-06T06:22:16.792133+00:00",
+    "total_evaluated_samples": 10,
+    "answerable_samples_count": 8,
+    "unanswerable_samples_count": 2,
+    "quality_scores_mean": {
+      "answer_correctness": 3.62,
+      "faithfulness": 4.88,
+      "citation_accuracy": 4.88,
+      "answer_relevancy": 4.12,
+      "rejection_accuracy": 1.0
+    },
+    "category_breakdown": {
+      "multi_hop": {
+        "count": 4,
+        "correctness_mean": 4.25,
+        "faithfulness_mean": 4.75,
+        "citation_accuracy_mean": 4.75,
+        "relevancy_mean": 4.5,
+        "rejection_accuracy": null,
+        "client_ttft_p50": 6277.9
+      },
+      "parametric": {
+        "count": 2,
+        "correctness_mean": 1.0,
+        "faithfulness_mean": 5.0,
+        "citation_accuracy_mean": 5.0,
+        "relevancy_mean": 3.0,
+        "rejection_accuracy": null,
+        "client_ttft_p50": 4499.44
+      },
+      "single_fact": {
+        "count": 2,
+        "correctness_mean": 5.0,
+        "faithfulness_mean": 5.0,
+        "citation_accuracy_mean": 5.0,
+        "relevancy_mean": 4.5,
+        "rejection_accuracy": null,
+        "client_ttft_p50": 4631.68
+      },
+      "unanswerable": {
+        "count": 2,
+        "correctness_mean": 5.0,
+        "faithfulness_mean": 5.0,
+        "citation_accuracy_mean": 5.0,
+        "relevancy_mean": 5.0,
+        "rejection_accuracy": 1.0,
+        "client_ttft_p50": 4385.72
+      }
+    },
+    "performance_stats": {
+      "client_ttft_ms": {
+        "p50": 4641.65,
+        "p95": 15069.25,
+        "mean": 5933.39
+      },
+      "server_ttft_ms": {
+        "p50": 2811.22,
+        "p95": 13357.18,
+        "mean": 4144.22
+      },
+      "total_latency_ms": {
+        "p50": 6038.55,
+        "p95": 16327.99,
+        "mean": 7529.51
+      },
+      "retrieval_duration_ms": {
+        "p50": 1690.81,
+        "p95": 2239.82,
+        "mean": 1741.58
+      },
+      "generation_duration_ms": {
+        "p50": 4359.58,
+        "p95": 14588.55,
+        "mean": 5709.97
+      },
+      "input_tokens_mean": 1103.2,
+      "output_tokens_mean": 662.0
+    },
+    "cost_summary": {
+      "total_tokens": 41358,
+      "rag_input_tokens": 11032,
+      "rag_output_tokens": 6620,
+      "judge_input_tokens": 20798,
+      "judge_output_tokens": 2908,
+      "off_peak_rmb": 0.0589,
+      "peak_rmb": 0.1178
+    }
+  },
+  "samples": [
+    {
+      "id": "GEN-09",
+      "category": "single_fact",
+      "query": "微服务网关异步 HTTP 客户端连接池的最小空闲连接数与最大并发连接数分别是多少？",
+      "answerable": true,
+      "reference_answer": "微服务网关异步 HTTP 客户端连接池配置中，最小空闲连接数 min_idle 设置为 10，最大并发连接数 max_connections 设定为 100。",
+      "generated_answer": "根据参考资料，微服务网关异步 HTTP 客户端连接池的配置如下：\n\n- **最小空闲连接数（min_idle）**：配置为 **10** [Ref-1]\n- **最大并发连接数（max_connections）**：设定为 **100**，作为系统单节点的刚性上限 [Ref-1]",
+      "citations_count": 1,
+      "citations": [
+        {
+          "citation_index": 1,
+          "chunk_id": "e514f5b4-36cb-4206-a051-fc0ef5cb03f4",
+          "document_id": "848c99da-9152-41ca-a3d8-d77f0edf50ed",
+          "document_name": "microservice_gateway_spec.md",
+          "page_number": 3,
+          "similarity_score": 0.999236,
+          "content_snippet": "## 2. 异步连接池参数配置\n网关底层采用高性能异步 HTTP 客户端连接池以复用 TCP 连接，减少握手开销。\n连接池核心参数定义如下：\n最小空闲连接数 min_idle 配置为 10，保证基础并发流量的即时响应；\n最大并发连接数 max_connections 设定为 100，作为系统单节点的刚性上限；\n连接获取超时时限 acquire_timeout_ms 设为 3000 毫秒。\n在...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 3 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 4971.21,
+        "client_generation_ms": 160.53,
+        "client_total_ms": 5152.88,
+        "server_ttft_ms": 2583.14,
+        "server_generation_ms": 2742.47,
+        "server_total_ms": 5004.29,
+        "dense_branch_duration_ms": 600.64,
+        "bm25_branch_duration_ms": 594.04,
+        "parallel_retrieval_wall_ms": 602.56,
+        "rrf_duration_ms": 0.07,
+        "reranker_duration_ms": 1637.26,
+        "total_retrieval_duration_ms": 2239.82,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1037,
+        "output_tokens": 146,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-09",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 5,
+        "correctness_reason": "回答准确给出 min_idle=10 与 max_connections=100，与参考答案及 Ref-1 完全一致，术语严格对应。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "所有声明均可直接由 Ref-1 原文支持，未引入上下文之外的参数或推论。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "两个关键数值均正确标注 [Ref-1]，引用分块精确支持对应结论，无错引或虚假引用。",
+        "relevancy_score": 5,
+        "relevancy_reason": "回答直击两个参数值，结构清晰，无冗余背景或无关事实。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 2,
+          "unique_cited_indices": [
+            1
+          ],
+          "valid_indices": [
+            1
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 1
+        },
+        "rejection_detected": false,
+        "rejection_reason": "问题在上下文中可回答，系统正常作答且未捏造内容，不涉及拒答。",
+        "overall_score": 5.0,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 1734,
+        "judge_output_tokens": 223,
+        "judge_cache_hit_tokens": 896,
+        "judge_cache_miss_tokens": 838,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 5,\n    \"reason\": \"回答准确给出 min_idle=10 与 max_connections=100，与参考答案及 Ref-1 完全一致，术语严格对应。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"所有声明均可直接由 Ref-1 原文支持，未引入上下文之外的参数或推论。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"两个关键数值均正确标注 [Ref-1]，引用分块精确支持对应结论，无错引或虚假引用。\"\n  },\n  \"relevancy\": {\n    \"score\": 5,\n    \"reason\": \"回答直击两个参数值，结构清晰，无冗余背景或无关事实。\"\n  },\n  \"rejection\": {\n    \"detected\": false,\n    \"reason\": \"问题在上下文中可回答，系统正常作答且未捏造内容，不涉及拒答。\"\n  }\n}",
+        "duration_ms": 4002.84
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1037,
+          "rag_output": 146,
+          "judge_input": 1734,
+          "judge_cache_hit": 896,
+          "judge_cache_miss": 838,
+          "judge_output": 223,
+          "total_input": 2771,
+          "total_output": 369,
+          "total_tokens": 3140
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.003369,
+          "peak_total": 0.006738,
+          "off_peak_rag": 0.001621,
+          "off_peak_judge": 0.001748,
+          "peak_rag": 0.003242,
+          "peak_judge": 0.003496
+        }
+      }
+    },
+    {
+      "id": "GEN-10",
+      "category": "single_fact",
+      "query": "分布式鉴权规范中，签名 JWT 令牌采用什么加密算法？Access Token 的有效期是多久？",
+      "answerable": true,
+      "reference_answer": "分布式鉴权采用非对称加密算法 RS256 对 JWT 进行签名与验签。颁发的 Access Token 标准有效时长为 72 小时。",
+      "generated_answer": "根据检索到的《微服务网关规范》，您所提的两个问题均有明确依据，回答如下：\n\n## 1. JWT 签名加密算法\n\n网关在承担系统无状态安全认证时，采用**基于非对称加密算法 RS256 签名的 JSON Web Token (JWT)** 进行用户身份鉴权 [Ref-1]，也就是说，签名使用的算法就是 RS256 非对称加密算法。\n\n> 需要说明：另外，参考资料中提到的 AES-256-GCM 算法，用于对数据库中的核心凭证与密钥（包括 JWT 数字签名私钥）进行静态落盘加密 [Ref-2]。该算法属于密钥存储保护措施，与 JWT 令牌的签名算法不是同一回事，因此不应混淆。\n\n## 2. Access Token 有效期\n\n颁发的 Access Token 具有严格的时效控制，其**标准有效期配置为 72 小时** [Ref-1]。\n\n## 补充说明（参考资料中同时记载的相关机制）\n\n- 网关本地维护公钥证书的内存缓存，公钥缓存失效周期 TTL 为 3600 秒，以免频繁向认证服务拉取证书而导致性能损耗 [Ref-1]。\n- 在用户登出或权限被回收时，网关通过 JTI 唯一黑名单机制，在令牌有效期内撤销该令牌的访问权 [Ref-1]。\n\n以上参数均直接引自参考资料，未作任何推测性补充。",
+      "citations_count": 2,
+      "citations": [
+        {
+          "citation_index": 1,
+          "chunk_id": "9a6e5331-79d4-4e69-ae36-ad14003d3228",
+          "document_id": "848c99da-9152-41ca-a3d8-d77f0edf50ed",
+          "document_name": "microservice_gateway_spec.md",
+          "page_number": 4,
+          "similarity_score": 0.999426,
+          "content_snippet": "## 3. 分布式鉴权与无状态令牌\n网关层承担系统无状态安全认证职责，采用基于非对称加密算法 RS256 签名的 JSON Web Token (JWT) 进行用户身份鉴权。\n颁发的 Access Token 具有严格的时效控制，其标准有效期配置为 72 小时。\n网关本地维护公钥证书内存缓存，公钥缓存失效周期 TTL 为 3600 秒，以避免频繁向认证服务拉取证书导致性能损耗。\n用户登出或权...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 4 页"
+        },
+        {
+          "citation_index": 2,
+          "chunk_id": "001b00d8-8097-4e61-8228-43b29e333863",
+          "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+          "document_name": "compliance_and_audit.md",
+          "page_number": 5,
+          "similarity_score": 0.855501,
+          "content_snippet": "## 4. 密钥管理与安全存储规范\n系统对所有涉及外部大模型供应商的 API Key、内部数据库登录密码及 JWT 数字签名私钥实施集中安全托管。\n核心凭证与密钥在数据库中必须使用 AES-256-GCM 算法进行高强度静态落盘加密，加密密钥由环境变量独立注入，严禁硬编码。\n密钥的最长使用生命周期为 90 天，系统将在密钥服役满 75 天时向管理员发送自动轮转告警通知，逾期强制要求更新。",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 5 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 4292.14,
+        "client_generation_ms": 1530.71,
+        "client_total_ms": 5851.51,
+        "server_ttft_ms": 2621.45,
+        "server_generation_ms": 4153.19,
+        "server_total_ms": 5808.22,
+        "dense_branch_duration_ms": 11.52,
+        "bm25_branch_duration_ms": 0.38,
+        "parallel_retrieval_wall_ms": 11.78,
+        "rrf_duration_ms": 0.06,
+        "reranker_duration_ms": 1620.32,
+        "total_retrieval_duration_ms": 1632.1,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1056,
+        "output_tokens": 423,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-10",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 5,
+        "correctness_reason": "回答准确指出 JWT 签名采用非对称加密算法 RS256，Access Token 标准有效期为 72 小时，与参考答案完全一致。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "所有核心声明（RS256 签名、72 小时有效期、AES-256-GCM 用于密钥存储、公钥缓存 TTL 3600 秒、JTI 黑名单）均可在 Ref-1 和 Ref-2 中找到直接证据，无幻觉。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "引用角标 [Ref-1] 和 [Ref-2] 精确对应支持相应结论的分块，无虚假引用或错引。",
+        "relevancy_score": 4,
+        "relevancy_reason": "回答直击提问核心，但补充了公钥缓存 TTL 和 JTI 黑名单等与问题无关的冗余信息，略有冗余。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 5,
+          "unique_cited_indices": [
+            1,
+            2
+          ],
+          "valid_indices": [
+            1,
+            2
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 2
+        },
+        "rejection_detected": false,
+        "rejection_reason": "问题在上下文中可回答，系统未拒答且正确提供了答案。",
+        "overall_score": 4.75,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 1977,
+        "judge_output_tokens": 279,
+        "judge_cache_hit_tokens": 896,
+        "judge_cache_miss_tokens": 1081,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 5,\n    \"reason\": \"回答准确指出 JWT 签名采用非对称加密算法 RS256，Access Token 标准有效期为 72 小时，与参考答案完全一致。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"所有核心声明（RS256 签名、72 小时有效期、AES-256-GCM 用于密钥存储、公钥缓存 TTL 3600 秒、JTI 黑名单）均可在 Ref-1 和 Ref-2 中找到直接证据，无幻觉。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"引用角标 [Ref-1] 和 [Ref-2] 精确对应支持相应结论的分块，无虚假引用或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 4,\n    \"reason\": \"回答直击提问核心，但补充了公钥缓存 TTL 和 JTI 黑名单等与问题无关的冗余信息，略有冗余。\"\n  },\n  \"rejection\": {\n    \"detected\": false,\n    \"reason\": \"问题在上下文中可回答，系统未拒答且正确提供了答案。\"\n  }\n}",
+        "duration_ms": 4080.81
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1056,
+          "rag_output": 423,
+          "judge_input": 1977,
+          "judge_cache_hit": 896,
+          "judge_cache_miss": 1081,
+          "judge_output": 279,
+          "total_input": 3033,
+          "total_output": 702,
+          "total_tokens": 3735
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.004963,
+          "peak_total": 0.009926,
+          "off_peak_rag": 0.002748,
+          "off_peak_judge": 0.002215,
+          "peak_rag": 0.005496,
+          "peak_judge": 0.00443
+        }
+      }
+    },
+    {
+      "id": "GEN-13",
+      "category": "multi_hop",
+      "query": "在网关面对突发高并发请求时，其底层连接池配置与请求超时重试机制是如何协同防止后端服务过载与雪崩的？",
+      "answerable": true,
+      "reference_answer": "网关通过限制最大并发连接数 max_connections 为 100 防止 TCP 连接耗尽；针对非幂等 POST 写入严格禁止自动重试；仅针对幂等 GET 查询在超时（timeout 为 5000ms）后自动重试 2 次，初始避让间隔 initial_interval_ms 为 500 毫秒，避免重试风暴引发后端二次雪崩。",
+      "generated_answer": "根据参考资料，可确认网关在突发高并发下具备以下防护机制，但资料未明确给出“连接池配置”与“超时重试机制”之间的完整联动规则。\n\n## 1. 连接池侧：限制并发连接并触发背压\n\n- 连接池最小空闲连接数 `min_idle` 配置为 10，用于保证基础并发流量的即时响应 [Ref-1]。\n- 最大并发连接数 `max_connections` 设定为 100，作为系统单节点的刚性上限 [Ref-1]。\n- 连接获取超时时限 `acquire_timeout_ms` 设为 3000 毫秒 [Ref-1]。\n- 在业务高峰期，若可用连接数耗尽且等待处理队列长度超过 200，系统会立刻触发弹性背压告警 `BackpressureWarning`，并启动排队限流策略以保护下游服务 [Ref-1]。\n\n因此，连接池通过最大连接数上限、连接获取超时和等待队列阈值背压，限制突发流量对下游的并发冲击 [Ref-1]。\n\n## 2. 超时与重试侧：释放慢请求占用并避免重试风暴\n\n- 全局接口超时参数 `timeout` 统一配置阈值为 5000 毫秒，即 5 秒 [Ref-3",
+      "citations_count": 1,
+      "citations": [
+        {
+          "citation_index": 1,
+          "chunk_id": "e514f5b4-36cb-4206-a051-fc0ef5cb03f4",
+          "document_id": "848c99da-9152-41ca-a3d8-d77f0edf50ed",
+          "document_name": "microservice_gateway_spec.md",
+          "page_number": 3,
+          "similarity_score": 0.908542,
+          "content_snippet": "## 2. 异步连接池参数配置\n网关底层采用高性能异步 HTTP 客户端连接池以复用 TCP 连接，减少握手开销。\n连接池核心参数定义如下：\n最小空闲连接数 min_idle 配置为 10，保证基础并发流量的即时响应；\n最大并发连接数 max_connections 设定为 100，作为系统单节点的刚性上限；\n连接获取超时时限 acquire_timeout_ms 设为 3000 毫秒。\n在...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 3 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 15069.25,
+        "client_generation_ms": 1232.91,
+        "client_total_ms": 16327.99,
+        "server_ttft_ms": 13357.18,
+        "server_generation_ms": 14588.55,
+        "server_total_ms": 16286.18,
+        "dense_branch_duration_ms": 12.94,
+        "bm25_branch_duration_ms": 0.34,
+        "parallel_retrieval_wall_ms": 13.21,
+        "rrf_duration_ms": 0.08,
+        "reranker_duration_ms": 1661.7,
+        "total_retrieval_duration_ms": 1674.91,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1168,
+        "output_tokens": 2048,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-13",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 3,
+        "correctness_reason": "回答正确列出了 max_connections=100、timeout=5000ms、GET 重试 2 次、initial_interval_ms=500ms 及 POST 禁止重试等核心事实，但未明确给出“协同防止过载与雪崩”的完整联动结论，且回答在 Ref-3 处截断，遗漏了重试机制的关键后半句。",
+        "faithfulness_score": 4,
+        "faithfulness_reason": "所有具体参数与机制均可在 Ref-1 和 Ref-3 中找到直接依据，仅开头“资料未明确给出完整联动规则”属于对上下文覆盖范围的合理判断，无事实性幻觉。",
+        "citation_accuracy_score": 4,
+        "citation_reason": "Ref-1 引用准确对应连接池参数与背压机制；Ref-3 引用对应超时与重试机制，但回答末尾引用不完整，且未对“协同”结论给出直接引用支持。",
+        "relevancy_score": 3,
+        "relevancy_reason": "回答分别罗列了连接池和超时重试机制，但未正面回答“如何协同防止后端过载与雪崩”这一核心问题，且包含 min_idle、acquire_timeout_ms 等与协同机制关联较弱的冗余细节。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 5,
+          "unique_cited_indices": [
+            1
+          ],
+          "valid_indices": [
+            1
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 1
+        },
+        "rejection_detected": false,
+        "rejection_reason": "问题在上下文中可回答，系统未拒答，而是给出了部分正确信息，不属于正确拒答场景。",
+        "overall_score": 3.5,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 2133,
+        "judge_output_tokens": 360,
+        "judge_cache_hit_tokens": 896,
+        "judge_cache_miss_tokens": 1237,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 3,\n    \"reason\": \"回答正确列出了 max_connections=100、timeout=5000ms、GET 重试 2 次、initial_interval_ms=500ms 及 POST 禁止重试等核心事实，但未明确给出“协同防止过载与雪崩”的完整联动结论，且回答在 Ref-3 处截断，遗漏了重试机制的关键后半句。\"\n  },\n  \"faithfulness\": {\n    \"score\": 4,\n    \"reason\": \"所有具体参数与机制均可在 Ref-1 和 Ref-3 中找到直接依据，仅开头“资料未明确给出完整联动规则”属于对上下文覆盖范围的合理判断，无事实性幻觉。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 4,\n    \"reason\": \"Ref-1 引用准确对应连接池参数与背压机制；Ref-3 引用对应超时与重试机制，但回答末尾引用不完整，且未对“协同”结论给出直接引用支持。\"\n  },\n  \"relevancy\": {\n    \"score\": 3,\n    \"reason\": \"回答分别罗列了连接池和超时重试机制，但未正面回答“如何协同防止后端过载与雪崩”这一核心问题，且包含 min_idle、acquire_timeout_ms 等与协同机制关联较弱的冗余细节。\"\n  },\n  \"rejection\": {\n    \"detected\": false,\n    \"reason\": \"问题在上下文中可回答，系统未拒答，而是给出了部分正确信息，不属于正确拒答场景。\"\n  }\n}",
+        "duration_ms": 5140.97
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1168,
+          "rag_output": 2048,
+          "judge_input": 2133,
+          "judge_cache_hit": 896,
+          "judge_cache_miss": 1237,
+          "judge_output": 360,
+          "total_input": 3301,
+          "total_output": 2408,
+          "total_tokens": 5709
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.012055,
+          "peak_total": 0.02411,
+          "off_peak_rag": 0.00936,
+          "off_peak_judge": 0.002695,
+          "peak_rag": 0.01872,
+          "peak_judge": 0.00539
+        }
+      }
+    },
+    {
+      "id": "GEN-15",
+      "category": "multi_hop",
+      "query": "系统对 API 密钥与 JWT 签名私钥等敏感凭证，分别在静态存储、内存缓存与生命周期轮转上实施了哪些安全控制？",
+      "answerable": true,
+      "reference_answer": "在静态存储上，数据库中的 API Key 和凭证使用 AES-256-GCM 算法强加密；在内存缓存上，网关维护公钥缓存以验证 RS256 签名，公钥缓存设置 3600 秒 TTL；在生命周期上，密钥最长使用周期为 90 天，在第 75 天触发自动轮转预警与强制更新。",
+      "generated_answer": "## 一、静态存储（落盘加密与托管）\n\n- 系统对涉及外部大模型供应商的 API Key、内部数据库登录密码以及 JWT 数字签名私钥，实施**集中安全托管** [Ref-1]。\n- 这些凭证与密钥在数据库中必须使用 **AES-256-GCM 算法**进行高强度静态落盘加密 [Ref-1]。\n- 加密所用的密钥由**环境变量独立注入，严禁硬编码** [Ref-1]。\n- 在数据分级层面，包含敏感凭证的“绝密级”数据被要求**严禁离开隔离专用内网环境**，机密级数据必须实施落盘加密存储 [Ref-3]。\n\n## 二、内存缓存\n\n- 参考资料中唯一涉及“内存缓存”的记载是：网关本地维护**公钥证书**内存缓存，其缓存失效周期 TTL 为 **3600 秒**，目的是避免频繁向认证服务拉取证书造成性能损耗 [Ref-2]。\n- 需要说明的是，该条描述的对象是**公钥证书**，并非 API Key 或 JWT 签名私钥。关于 API 密钥、JWT 签名私钥等敏感凭证在**内存缓存环节**的安全控制措施（如内存加密、驻留时限、清零策略等），**根据当前知识库检索结果，未找到相关依据，无法回答**。\n\n## 三、生命周期与轮转\n\n- 密钥的**最长使用生命周期为 90 天**；系统会在密钥服役满 **75 天**时向管理员发送自动轮转告警通知，逾期则**强制要求更新** [Ref-1]。\n- 与令牌时效相关的控制为：采用 RS256 非对称算法签名的 JWT，其 Access Token 标准有效期配置为 **72 小时** [Ref-2]；用户登出或权限回收时，网关通过 JTI 唯一黑名单机制在有效期内撤销该令牌访问权 [Ref-2]。需注意，72 小时属于**令牌有效期**，并非签名私钥本身的轮转周期。\n\n## 四、缺失项说明\n\n- **JWT 签名私钥自身的轮转周期与轮转流程**：参考资料仅给出“密钥最长 90 天、75 天告警、逾期强制更新”的统一规则 [Ref-1]，未单独说明 JWT 签名私钥的轮转细节，无法进一步回答。\n- **敏感凭证在内存中的安全控制**：未找到依据，无法回答（见第二部分）。\n- **API Key 的分发、使用端保管等其他环节控制**：参考资料未涉及，无法回答。",
+      "citations_count": 3,
+      "citations": [
+        {
+          "citation_index": 1,
+          "chunk_id": "001b00d8-8097-4e61-8228-43b29e333863",
+          "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+          "document_name": "compliance_and_audit.md",
+          "page_number": 5,
+          "similarity_score": 0.98482,
+          "content_snippet": "## 4. 密钥管理与安全存储规范\n系统对所有涉及外部大模型供应商的 API Key、内部数据库登录密码及 JWT 数字签名私钥实施集中安全托管。\n核心凭证与密钥在数据库中必须使用 AES-256-GCM 算法进行高强度静态落盘加密，加密密钥由环境变量独立注入，严禁硬编码。\n密钥的最长使用生命周期为 90 天，系统将在密钥服役满 75 天时向管理员发送自动轮转告警通知，逾期强制要求更新。",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 5 页"
+        },
+        {
+          "citation_index": 3,
+          "chunk_id": "b785e2dc-9b61-42f1-a298-ae9789a2bca7",
+          "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+          "document_name": "compliance_and_audit.md",
+          "page_number": 2,
+          "similarity_score": 0.285852,
+          "content_snippet": "## 1. 数据分类分级原则与标准\n为满足企业级数据合规与金融监管要求，系统遵循中国网络安全法及 GDPR 规范，对平台内产生与流转的所有数据实行四级分类分级制度：\n公开级（Public）：系统公开技术手册与开源文档；\n内部级（Internal）：仅限企业内部员工访问的常规知识库；\n机密级（Confidential）：包含业务细节的技术规格文档及用户私有多轮对话数据，必须实施落盘加密存储；\n...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 2 页"
+        },
+        {
+          "citation_index": 2,
+          "chunk_id": "9a6e5331-79d4-4e69-ae36-ad14003d3228",
+          "document_id": "848c99da-9152-41ca-a3d8-d77f0edf50ed",
+          "document_name": "microservice_gateway_spec.md",
+          "page_number": 4,
+          "similarity_score": 0.649177,
+          "content_snippet": "## 3. 分布式鉴权与无状态令牌\n网关层承担系统无状态安全认证职责，采用基于非对称加密算法 RS256 签名的 JSON Web Token (JWT) 进行用户身份鉴权。\n颁发的 Access Token 具有严格的时效控制，其标准有效期配置为 72 小时。\n网关本地维护公钥证书内存缓存，公钥缓存失效周期 TTL 为 3600 秒，以避免频繁向认证服务拉取证书导致性能损耗。\n用户登出或权...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 4 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 6536.74,
+        "client_generation_ms": 2948.1,
+        "client_total_ms": 9513.25,
+        "server_ttft_ms": 4788.01,
+        "server_generation_ms": 7733.76,
+        "server_total_ms": 9467.94,
+        "dense_branch_duration_ms": 11.57,
+        "bm25_branch_duration_ms": 0.37,
+        "parallel_retrieval_wall_ms": 11.83,
+        "rrf_duration_ms": 0.07,
+        "reranker_duration_ms": 1699.76,
+        "total_retrieval_duration_ms": 1711.59,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1072,
+        "output_tokens": 1126,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-15",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 5,
+        "correctness_reason": "回答准确覆盖了静态存储的 AES-256-GCM 加密、内存缓存的公钥缓存 3600 秒 TTL、生命周期的 90 天/75 天轮转规则，并正确区分了公钥缓存与敏感凭证内存控制、令牌有效期与私钥轮转周期，与参考答案完全一致。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "所有声明均严格对应 Ref-1、Ref-2、Ref-3 的原文，对未提及的内存控制、私钥轮转细节明确标注无依据，无任何脑补或幻觉。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "每个关键事实均正确标注了支持其结论的分块编号（如 AES-256-GCM 引用 Ref-1、公钥缓存 TTL 引用 Ref-2、绝密级引用 Ref-3），无虚假或错引。",
+        "relevancy_score": 5,
+        "relevancy_reason": "回答直击提问的三个维度（静态存储、内存缓存、生命周期轮转），结构清晰，对缺失项明确说明，无冗余跑题内容。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 9,
+          "unique_cited_indices": [
+            1,
+            2,
+            3
+          ],
+          "valid_indices": [
+            1,
+            2,
+            3
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 3
+        },
+        "rejection_detected": true,
+        "rejection_reason": "对于上下文中无依据的敏感凭证内存控制、JWT 私钥独立轮转细节等问题，系统明确说明“未找到相关依据，无法回答”，正确执行了拒答。",
+        "overall_score": 5.0,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 2303,
+        "judge_output_tokens": 345,
+        "judge_cache_hit_tokens": 1024,
+        "judge_cache_miss_tokens": 1279,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 5,\n    \"reason\": \"回答准确覆盖了静态存储的 AES-256-GCM 加密、内存缓存的公钥缓存 3600 秒 TTL、生命周期的 90 天/75 天轮转规则，并正确区分了公钥缓存与敏感凭证内存控制、令牌有效期与私钥轮转周期，与参考答案完全一致。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"所有声明均严格对应 Ref-1、Ref-2、Ref-3 的原文，对未提及的内存控制、私钥轮转细节明确标注无依据，无任何脑补或幻觉。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"每个关键事实均正确标注了支持其结论的分块编号（如 AES-256-GCM 引用 Ref-1、公钥缓存 TTL 引用 Ref-2、绝密级引用 Ref-3），无虚假或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 5,\n    \"reason\": \"回答直击提问的三个维度（静态存储、内存缓存、生命周期轮转），结构清晰，对缺失项明确说明，无冗余跑题内容。\"\n  },\n  \"rejection\": {\n    \"detected\": true,\n    \"reason\": \"对于上下文中无依据的敏感凭证内存控制、JWT 私钥独立轮转细节等问题，系统明确说明“未找到相关依据，无法回答”，正确执行了拒答。\"\n  }\n}",
+        "duration_ms": 4245.6
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1072,
+          "rag_output": 1126,
+          "judge_input": 2303,
+          "judge_cache_hit": 1024,
+          "judge_cache_miss": 1279,
+          "judge_output": 345,
+          "total_input": 3375,
+          "total_output": 1471,
+          "total_tokens": 4846
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.008255,
+          "peak_total": 0.016511,
+          "off_peak_rag": 0.005576,
+          "off_peak_judge": 0.002679,
+          "peak_rag": 0.011152,
+          "peak_judge": 0.005359
+        }
+      }
+    },
+    {
+      "id": "GEN-26",
+      "category": "unanswerable",
+      "query": "企业超过 180 天的冷备份审计日志是否统一归档在 ClickHouse 或 Snowflake 分布式列式数仓中？",
+      "answerable": false,
+      "reference_answer": "规范仅说明超过 180 天的日志转存至具备 WORM 特性的对象存储归档桶中，未提及使用 ClickHouse 或 Snowflake 数仓归档，系统应指出未找到依据并拒绝编造。",
+      "generated_answer": "## 结论\n\n**不是。** 根据知识库中关于审计日志留存规范的记载，留存期满 180 天的审计日志，是**统一转储至基于 WORM（单写多读防篡改）策略的对象存储归档桶中**，以满足长期审计调阅要求 [Ref-1]。\n\n此外，管理员后台敏感操作记录、智能体多步执行 Trace 元数据以及安全风控拦截事件，必须在**冷备份存储**中保存不少于 180 天 [Ref-1]。\n\n## 缺失项说明\n\n关于您询问的「是否统一归档在 ClickHouse 或 Snowflake 分布式列式数仓中」：\n\n- 参考资料中**未提及 ClickHouse**，也**未提及 Snowflake** 或任何分布式列式数仓作为审计日志的归档载体 [Ref-1]。\n- 参考资料仅明确了冷备份存储保存期限（不少于 180 天）以及留存期满后的转储目标（WORM 对象存储归档桶），**未对归档所依托的具体数据库产品类型或技术选型作出说明**。\n\n因此，关于「是否归档于 ClickHouse / Snowflake」这一具体问题，**根据当前知识库检索结果，未找到相关依据，无法回答**，请勿据此推测。",
+      "citations_count": 1,
+      "citations": [
+        {
+          "citation_index": 1,
+          "chunk_id": "3001dce5-d1d7-44ad-9070-c8cbafe8af81",
+          "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+          "document_name": "compliance_and_audit.md",
+          "page_number": 4,
+          "similarity_score": 0.997624,
+          "content_snippet": "## 3. 审计日志与追踪数据留存规范\n为确保系统所有行为具备可追溯性与法律合规证据力，系统对运维操作与模型调用实施全生命周期日志留存：\n管理员后台敏感操作记录、智能体多步执行 Trace 元数据以及安全风控拦截事件，必须在冷备份存储中保存不少于 180 天。\n留存期满 180 天的审计日志，统一转储至基于 WORM（单写多读防篡改）策略的对象存储归档桶中，满足长期审计调阅要求。",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 4 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 4344.54,
+        "client_generation_ms": 1370.42,
+        "client_total_ms": 5740.19,
+        "server_ttft_ms": 2657.2,
+        "server_generation_ms": 4026.77,
+        "server_total_ms": 5700.41,
+        "dense_branch_duration_ms": 10.95,
+        "bm25_branch_duration_ms": 0.43,
+        "parallel_retrieval_wall_ms": 11.17,
+        "rrf_duration_ms": 0.06,
+        "reranker_duration_ms": 1640.27,
+        "total_retrieval_duration_ms": 1651.44,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1075,
+        "output_tokens": 405,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-26",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 5,
+        "correctness_reason": "回答准确指出规范仅说明转储至 WORM 对象存储归档桶，未提及 ClickHouse/Snowflake，与参考答案完全一致。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "所有声明（180天冷备份、WORM对象存储归档、未提及ClickHouse/Snowflake）均可从 Ref-1 直接找到依据，无幻觉。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "引用 [Ref-1] 精确支持转储至 WORM 对象存储及冷备份保存期限的结论，无虚假或错引。",
+        "relevancy_score": 5,
+        "relevancy_reason": "直击问题核心，明确否定 ClickHouse/Snowflake 归档并说明未找到依据，结构清晰无冗余。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 3,
+          "unique_cited_indices": [
+            1
+          ],
+          "valid_indices": [
+            1
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 1
+        },
+        "rejection_detected": true,
+        "rejection_reason": "问题在上下文中无依据，系统明确说明未找到相关依据并拒绝编造，正确拒答。",
+        "overall_score": 5.0,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 1980,
+        "judge_output_tokens": 253,
+        "judge_cache_hit_tokens": 896,
+        "judge_cache_miss_tokens": 1084,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 5,\n    \"reason\": \"回答准确指出规范仅说明转储至 WORM 对象存储归档桶，未提及 ClickHouse/Snowflake，与参考答案完全一致。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"所有声明（180天冷备份、WORM对象存储归档、未提及ClickHouse/Snowflake）均可从 Ref-1 直接找到依据，无幻觉。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"引用 [Ref-1] 精确支持转储至 WORM 对象存储及冷备份保存期限的结论，无虚假或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 5,\n    \"reason\": \"直击问题核心，明确否定 ClickHouse/Snowflake 归档并说明未找到依据，结构清晰无冗余。\"\n  },\n  \"rejection\": {\n    \"detected\": true,\n    \"reason\": \"问题在上下文中无依据，系统明确说明未找到相关依据并拒绝编造，正确拒答。\"\n  }\n}",
+        "duration_ms": 3729.93
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1075,
+          "rag_output": 405,
+          "judge_input": 1980,
+          "judge_cache_hit": 896,
+          "judge_cache_miss": 1084,
+          "judge_output": 253,
+          "total_input": 3055,
+          "total_output": 658,
+          "total_tokens": 3713
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.004809,
+          "peak_total": 0.009618,
+          "off_peak_rag": 0.002695,
+          "off_peak_judge": 0.002114,
+          "peak_rag": 0.00539,
+          "peak_judge": 0.004228
+        }
+      }
+    },
+    {
+      "id": "GEN-30",
+      "category": "unanswerable",
+      "query": "知识库在解析财务报销发票或合同扫描件 PDF 时，是否集成了商业 OCR 服务来提取手写签名？",
+      "answerable": false,
+      "reference_answer": "现有文档未提及知识库对商业 OCR 提取手写签名的集成或支持，系统应明确告知未检索到相关事实依据，拒绝推测。",
+      "generated_answer": "根据当前知识库检索结果，未找到相关依据，无法回答。\n\n**原因说明：**\n\n1. **关于 OCR 服务集成**：参考资料中未出现任何关于在 PDF 解析流程中集成商业 OCR 服务（或自研 OCR 能力）的记载，也未涉及财务报销发票、合同扫描件的文档解析流程描述。因此，无法确认是否存在此类集成。\n\n2. **关于手写签名提取**：参考资料未提及手写签名识别、签名区域定位或签名图像抽取相关的功能、算法或第三方服务。\n\n3. **需要特别区分的一点**：参考资料 [Ref-2] 确实提到了文本处理管道，但其内容是**个人身份信息（PII）脱敏过滤**——在文本进入语义向量化模型及向量知识库存储前，通过正则表达式规则集与轻量化命名实体识别（NER）对姓名、身份证号、手机号、银行卡号、邮箱等做掩码遮蔽 [Ref-2]。该机制作用于**已结构化的文本内容**，属于安全合规清洗环节，与“从扫描件图像中通过 OCR 提取文字及手写签名”在技术机制与目标上均不相同，不能作为本问题的依据。\n\n4. **其他可用信息**：参考资料仅覆盖数据分类分级标准 [Ref-1]、PII 脱敏要求 [Ref-2]、网关 JWT 鉴权与令牌有效期（72 小时）、公钥缓存 TTL（3600 秒）[Ref-3]、以及密钥的 AES-256-GCM 加密存储与 90 天轮转策略 [Ref-4]，这些均与 OCR / 手写签名提取无直接关联。\n\n综上，关于“是否集成商业 OCR 服务提取手写签名”以及“发票/合同扫描件 PDF 的解析方式”，参考资料中均未做说明，无法回答，亦不作推测。",
+      "citations_count": 4,
+      "citations": [
+        {
+          "citation_index": 2,
+          "chunk_id": "26261adc-922f-4a9b-934a-eaffee9e57ca",
+          "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+          "document_name": "compliance_and_audit.md",
+          "page_number": 3,
+          "similarity_score": 0.002075,
+          "content_snippet": "## 2. 个人身份信息脱敏过滤要求\n所有外部用户输入文本在进入语义向量化（Embedding）模型及向量知识库存储前，必须经过前置数据清洗脱敏管道。\n脱敏管道结合正则表达式规则集与轻量化命名实体识别（NER）技术，对个人身份信息（PII）进行强制遮蔽脱敏：\n涉及用户姓名、居民身份证号、手机号码、企业银行卡号及电子邮箱地址等核心隐私信息，必须自动替换为掩码字符（如将手机号脱敏为 138***...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 3 页"
+        },
+        {
+          "citation_index": 1,
+          "chunk_id": "b785e2dc-9b61-42f1-a298-ae9789a2bca7",
+          "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+          "document_name": "compliance_and_audit.md",
+          "page_number": 2,
+          "similarity_score": 0.025249,
+          "content_snippet": "## 1. 数据分类分级原则与标准\n为满足企业级数据合规与金融监管要求，系统遵循中国网络安全法及 GDPR 规范，对平台内产生与流转的所有数据实行四级分类分级制度：\n公开级（Public）：系统公开技术手册与开源文档；\n内部级（Internal）：仅限企业内部员工访问的常规知识库；\n机密级（Confidential）：包含业务细节的技术规格文档及用户私有多轮对话数据，必须实施落盘加密存储；\n...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 2 页"
+        },
+        {
+          "citation_index": 3,
+          "chunk_id": "9a6e5331-79d4-4e69-ae36-ad14003d3228",
+          "document_id": "848c99da-9152-41ca-a3d8-d77f0edf50ed",
+          "document_name": "microservice_gateway_spec.md",
+          "page_number": 4,
+          "similarity_score": 0.001925,
+          "content_snippet": "## 3. 分布式鉴权与无状态令牌\n网关层承担系统无状态安全认证职责，采用基于非对称加密算法 RS256 签名的 JSON Web Token (JWT) 进行用户身份鉴权。\n颁发的 Access Token 具有严格的时效控制，其标准有效期配置为 72 小时。\n网关本地维护公钥证书内存缓存，公钥缓存失效周期 TTL 为 3600 秒，以避免频繁向认证服务拉取证书导致性能损耗。\n用户登出或权...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 4 页"
+        },
+        {
+          "citation_index": 4,
+          "chunk_id": "001b00d8-8097-4e61-8228-43b29e333863",
+          "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+          "document_name": "compliance_and_audit.md",
+          "page_number": 5,
+          "similarity_score": 0.000917,
+          "content_snippet": "## 4. 密钥管理与安全存储规范\n系统对所有涉及外部大模型供应商的 API Key、内部数据库登录密码及 JWT 数字签名私钥实施集中安全托管。\n核心凭证与密钥在数据库中必须使用 AES-256-GCM 算法进行高强度静态落盘加密，加密密钥由环境变量独立注入，严禁硬编码。\n密钥的最长使用生命周期为 90 天，系统将在密钥服役满 75 天时向管理员发送自动轮转告警通知，逾期强制要求更新。",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 5 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 4426.9,
+        "client_generation_ms": 2466.19,
+        "client_total_ms": 6918.72,
+        "server_ttft_ms": 2761.91,
+        "server_generation_ms": 5226.88,
+        "server_total_ms": 6879.35,
+        "dense_branch_duration_ms": 11.54,
+        "bm25_branch_duration_ms": 0.29,
+        "parallel_retrieval_wall_ms": 11.82,
+        "rrf_duration_ms": 0.09,
+        "reranker_duration_ms": 1618.22,
+        "total_retrieval_duration_ms": 1630.04,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1098,
+        "output_tokens": 477,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-30",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 5,
+        "correctness_reason": "回答正确识别上下文无 OCR/手写签名相关信息，明确拒答且未推测，与参考答案要求完全一致。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "所有声明均严格基于上下文：Ref-2 的 PII 脱敏描述、Ref-1/3/4 的覆盖范围均准确引用，无任何脑补或幻觉。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "引用角标 [Ref-1]~[Ref-4] 均精确对应支持其陈述的分块，无虚假引用或错引。",
+        "relevancy_score": 5,
+        "relevancy_reason": "直击问题核心，明确说明未找到依据并逐点解释，结构清晰，无冗余废话。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 6,
+          "unique_cited_indices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "valid_indices": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 4
+        },
+        "rejection_detected": true,
+        "rejection_reason": "问题在上下文中无依据 (answerable=false)，系统明确告知未检索到相关事实并拒绝推测，属正确拒答。",
+        "overall_score": 5.0,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 2113,
+        "judge_output_tokens": 256,
+        "judge_cache_hit_tokens": 896,
+        "judge_cache_miss_tokens": 1217,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 5,\n    \"reason\": \"回答正确识别上下文无 OCR/手写签名相关信息，明确拒答且未推测，与参考答案要求完全一致。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"所有声明均严格基于上下文：Ref-2 的 PII 脱敏描述、Ref-1/3/4 的覆盖范围均准确引用，无任何脑补或幻觉。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"引用角标 [Ref-1]~[Ref-4] 均精确对应支持其陈述的分块，无虚假引用或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 5,\n    \"reason\": \"直击问题核心，明确说明未找到依据并逐点解释，结构清晰，无冗余废话。\"\n  },\n  \"rejection\": {\n    \"detected\": true,\n    \"reason\": \"问题在上下文中无依据 (answerable=false)，系统明确告知未检索到相关事实并拒绝推测，属正确拒答。\"\n  }\n}",
+        "duration_ms": 5290.6
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1098,
+          "rag_output": 477,
+          "judge_input": 2113,
+          "judge_cache_hit": 896,
+          "judge_cache_miss": 1217,
+          "judge_output": 256,
+          "total_input": 3211,
+          "total_output": 733,
+          "total_tokens": 3944
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.005265,
+          "peak_total": 0.01053,
+          "off_peak_rag": 0.003006,
+          "off_peak_judge": 0.002259,
+          "peak_rag": 0.006012,
+          "peak_judge": 0.004518
+        }
+      }
+    },
+    {
+      "id": "GEN-17",
+      "category": "multi_hop",
+      "query": "高可用架构中 ModelHealthStore 负责收集和聚合哪些核心健康指标？同时合规审计规范对平台多步执行 Trace 元数据的冷备份保存期限是如何要求的？",
+      "answerable": true,
+      "reference_answer": "根据高可用规范与合规规范：1. ModelHealthStore 核心职责包括实时汇总各模型节点的吞吐量 QPS、P95 响应延迟、网络错误率以及各实例当前所处的熔断器状态，并在控制台及运维接口提供标准 Prometheus 指标暴露（挂载于 /metrics 接口）；2. 合规审计规范要求智能体多步执行 Trace 元数据必须在冷备份存储中保存不少于 180 天。",
+      "generated_answer": "### 1. ModelHealthStore 负责收集和聚合的核心健康指标\n\n根据参考资料，ModelHealthStore 负责实时收集、聚合与监控所有已注册下游模型节点的健康指标，核心包括：\n\n- 各模型节点的吞吐量 QPS；\n- P95 响应延迟；\n- 网络错误率；\n- 各实例当前所处的熔断器状态。\n\n同时，ModelHealthStore 在控制台及运维接口提供标准 Prometheus 指标暴露（挂载于 `/metrics` 接口），用于实现亚秒级健康状态透视与动态降级调度 [Ref-1]。\n\n### 2. 多步执行 Trace 元数据的冷备份保存期限\n\n根据合规审计规范，智能体多步执行 Trace 元数据必须在冷备份存储中保存不少于 **180 天** [Ref-2]。留存期满 180 天后，审计日志统一转储至基于 WORM（单写多读防篡改）策略的对象存储归档桶中，以满足长期审计调阅要求 [Ref-2]。\n\n综上，ModelHealthStore 的核心监控指标已在参考资料中明确列出；多步执行 Trace 元数据的冷备份保存期限为不少于 180 天，相关资料亦有明确说明。",
+      "citations_count": 2,
+      "citations": [
+        {
+          "citation_index": 1,
+          "chunk_id": "8990eb8f-59b0-4c06-ad11-ae20f4d2adbd",
+          "document_id": "b57de31e-3b75-4316-83b3-e1db19474c88",
+          "document_name": "high_availability_resilience.md",
+          "page_number": 5,
+          "similarity_score": 0.999263,
+          "content_snippet": "## 4. ModelHealthStore 监控组件职责\n系统内置独立的高可用运行监控组件 ModelHealthStore，负责实时收集、聚合与监控所有已注册下游模型节点的健康指标。\nModelHealthStore 的核心职责包括：\n实时汇总各模型节点的吞吐量 QPS、P95 响应延迟、网络错误率以及各实例当前所处的熔断器状态；\n在控制台及运维接口提供标准 Prometheus 指标暴...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 5 页"
+        },
+        {
+          "citation_index": 2,
+          "chunk_id": "3001dce5-d1d7-44ad-9070-c8cbafe8af81",
+          "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+          "document_name": "compliance_and_audit.md",
+          "page_number": 4,
+          "similarity_score": 0.997158,
+          "content_snippet": "## 3. 审计日志与追踪数据留存规范\n为确保系统所有行为具备可追溯性与法律合规证据力，系统对运维操作与模型调用实施全生命周期日志留存：\n管理员后台敏感操作记录、智能体多步执行 Trace 元数据以及安全风控拦截事件，必须在冷备份存储中保存不少于 180 天。\n留存期满 180 天的审计日志，统一转储至基于 WORM（单写多读防篡改）策略的对象存储归档桶中，满足长期审计调阅要求。",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 4 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 4675.21,
+        "client_generation_ms": 1072.14,
+        "client_total_ms": 5780.22,
+        "server_ttft_ms": 2887.28,
+        "server_generation_ms": 3958.52,
+        "server_total_ms": 5731.66,
+        "dense_branch_duration_ms": 14.4,
+        "bm25_branch_duration_ms": 0.59,
+        "parallel_retrieval_wall_ms": 14.73,
+        "rrf_duration_ms": 0.09,
+        "reranker_duration_ms": 1734.55,
+        "total_retrieval_duration_ms": 1749.28,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1066,
+        "output_tokens": 449,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-17",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 5,
+        "correctness_reason": "回答完整列出 QPS、P95 延迟、网络错误率、熔断器状态及 /metrics 暴露，并准确给出 Trace 元数据冷备份不少于 180 天，与参考答案完全一致。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "所有声明均可直接对应 Ref-1 与 Ref-2 原文，无上下文未提及的技术细节或脑补内容。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "指标列表与 Prometheus 暴露引用 [Ref-1]，Trace 冷备份 180 天及 WORM 转储引用 [Ref-2]，角标与支持分块精确对应。",
+        "relevancy_score": 5,
+        "relevancy_reason": "回答直击两个提问核心，结构清晰，无冗余跑题内容。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 3,
+          "unique_cited_indices": [
+            1,
+            2
+          ],
+          "valid_indices": [
+            1,
+            2
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 2
+        },
+        "rejection_detected": false,
+        "rejection_reason": "问题在上下文中均有依据，系统正常作答且未捏造，不涉及拒答。",
+        "overall_score": 5.0,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 2005,
+        "judge_output_tokens": 259,
+        "judge_cache_hit_tokens": 896,
+        "judge_cache_miss_tokens": 1109,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 5,\n    \"reason\": \"回答完整列出 QPS、P95 延迟、网络错误率、熔断器状态及 /metrics 暴露，并准确给出 Trace 元数据冷备份不少于 180 天，与参考答案完全一致。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"所有声明均可直接对应 Ref-1 与 Ref-2 原文，无上下文未提及的技术细节或脑补内容。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"指标列表与 Prometheus 暴露引用 [Ref-1]，Trace 冷备份 180 天及 WORM 转储引用 [Ref-2]，角标与支持分块精确对应。\"\n  },\n  \"relevancy\": {\n    \"score\": 5,\n    \"reason\": \"回答直击两个提问核心，结构清晰，无冗余跑题内容。\"\n  },\n  \"rejection\": {\n    \"detected\": false,\n    \"reason\": \"问题在上下文中均有依据，系统正常作答且未捏造，不涉及拒答。\"\n  }\n}",
+        "duration_ms": 4828.7
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1066,
+          "rag_output": 449,
+          "judge_input": 2005,
+          "judge_cache_hit": 896,
+          "judge_cache_miss": 1109,
+          "judge_output": 259,
+          "total_input": 3071,
+          "total_output": 708,
+          "total_tokens": 3779
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.005025,
+          "peak_total": 0.01005,
+          "off_peak_rag": 0.002862,
+          "off_peak_judge": 0.002163,
+          "peak_rag": 0.005724,
+          "peak_judge": 0.004326
+        }
+      }
+    },
+    {
+      "id": "GEN-22",
+      "category": "parametric",
+      "query": "微服务网关异步连接池中，keepalive_timeout 和 connection_timeout 的具体设置数值分别是多少？",
+      "answerable": true,
+      "reference_answer": "在网关异步连接池中，keepalive_timeout 设置为 60 秒（60s），连接建立超时时间 connection_timeout 设定为 2000 毫秒（2000ms）。",
+      "generated_answer": "根据当前知识库检索结果，未找到相关依据，无法回答。\n\n具体说明如下：\n\n1. **`keepalive_timeout`**：参考资料中未提及该参数，无任何配置数值可供引用。\n2. **`connection_timeout`**：参考资料中同样未提及该参数，无任何配置数值可供引用。\n\n为避免混淆，以下列出参考资料中**确实记载**的连接池及超时相关参数（均非您所询问的这两项）：\n\n- 最小空闲连接数 `min_idle` 为 10 [Ref-1]；\n- 最大并发连接数 `max_connections` 为 100 [Ref-1]；\n- 连接获取超时时限 `acquire_timeout_ms` 为 3000 毫秒 [Ref-1]；\n- 全局接口超时参数 `timeout` 为 5000 毫秒 [Ref-2]；\n- GET 请求重试退避间隔 `initial_interval_ms` 为 500 毫秒 [Ref-2]。\n\n上述参数与您所问的 `keepalive_timeout`、`connection_timeout` 并非同一配置项，参考资料中未对后两者作任何说明，故不作推测。",
+      "citations_count": 2,
+      "citations": [
+        {
+          "citation_index": 1,
+          "chunk_id": "e514f5b4-36cb-4206-a051-fc0ef5cb03f4",
+          "document_id": "848c99da-9152-41ca-a3d8-d77f0edf50ed",
+          "document_name": "microservice_gateway_spec.md",
+          "page_number": 3,
+          "similarity_score": 0.988249,
+          "content_snippet": "## 2. 异步连接池参数配置\n网关底层采用高性能异步 HTTP 客户端连接池以复用 TCP 连接，减少握手开销。\n连接池核心参数定义如下：\n最小空闲连接数 min_idle 配置为 10，保证基础并发流量的即时响应；\n最大并发连接数 max_connections 设定为 100，作为系统单节点的刚性上限；\n连接获取超时时限 acquire_timeout_ms 设为 3000 毫秒。\n在...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 3 页"
+        },
+        {
+          "citation_index": 2,
+          "chunk_id": "e55427ef-406d-4ba1-8db0-8f8936fa4d34",
+          "document_id": "848c99da-9152-41ca-a3d8-d77f0edf50ed",
+          "document_name": "microservice_gateway_spec.md",
+          "page_number": 2,
+          "similarity_score": 0.931012,
+          "content_snippet": "## 1. 流量接入与超时控制\n微服务网关作为整个系统的流量接入入口，负责所有业务微服务与下游大模型代理的统一反向代理与动态路由。\n为保障系统吞吐量并防止慢请求占用连接，网关对下游接口设置严格的超时阈值。\n全局接口超时参数为 timeout，其统一配置阈值为 5000 毫秒（即 5 秒）。\n当针对大模型服务端推理耗时超过 5000ms 时，网关将主动中断 HTTP 传输连接，并向客户端抛出 ...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 2 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 4608.09,
+        "client_generation_ms": 1174.7,
+        "client_total_ms": 5831.81,
+        "server_ttft_ms": 2860.53,
+        "server_generation_ms": 4053.43,
+        "server_total_ms": 5782.09,
+        "dense_branch_duration_ms": 11.52,
+        "bm25_branch_duration_ms": 0.38,
+        "parallel_retrieval_wall_ms": 11.77,
+        "rrf_duration_ms": 0.07,
+        "reranker_duration_ms": 1694.93,
+        "total_retrieval_duration_ms": 1706.7,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1042,
+        "output_tokens": 448,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-22",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 1,
+        "correctness_reason": "参考答案明确给出 keepalive_timeout=60s、connection_timeout=2000ms，而系统回答称未找到依据并拒绝回答，核心事实完全缺失。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "系统回答中所有声明（未提及 keepalive_timeout/connection_timeout，以及列出的 min_idle=10、max_connections=100、acquire_timeout_ms=3000、timeout=5000、initial_interval_ms=500）均严格对应 Ref-1 与 Ref-2，无幻觉。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "列出的每个参数均正确标注了支持该事实的分块角标（[Ref-1] 或 [Ref-2]），无虚假引用或错引。",
+        "relevancy_score": 2,
+        "relevancy_reason": "回答虽围绕连接池与超时参数展开，但核心是拒答并列举大量无关参数，未直接回答用户询问的两个具体数值，严重偏题。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 5,
+          "unique_cited_indices": [
+            1,
+            2
+          ],
+          "valid_indices": [
+            1,
+            2
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 2
+        },
+        "rejection_detected": false,
+        "rejection_reason": "问题在上下文中实际有依据（answerable=true），系统却错误判定为无依据并拒答，属于错误拒答。",
+        "overall_score": 3.25,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 1937,
+        "judge_output_tokens": 314,
+        "judge_cache_hit_tokens": 1408,
+        "judge_cache_miss_tokens": 529,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 1,\n    \"reason\": \"参考答案明确给出 keepalive_timeout=60s、connection_timeout=2000ms，而系统回答称未找到依据并拒绝回答，核心事实完全缺失。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"系统回答中所有声明（未提及 keepalive_timeout/connection_timeout，以及列出的 min_idle=10、max_connections=100、acquire_timeout_ms=3000、timeout=5000、initial_interval_ms=500）均严格对应 Ref-1 与 Ref-2，无幻觉。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"列出的每个参数均正确标注了支持该事实的分块角标（[Ref-1] 或 [Ref-2]），无虚假引用或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 2,\n    \"reason\": \"回答虽围绕连接池与超时参数展开，但核心是拒答并列举大量无关参数，未直接回答用户询问的两个具体数值，严重偏题。\"\n  },\n  \"rejection\": {\n    \"detected\": false,\n    \"reason\": \"问题在上下文中实际有依据（answerable=true），系统却错误判定为无依据并拒答，属于错误拒答。\"\n  }\n}",
+        "duration_ms": 5821.61
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1042,
+          "rag_output": 448,
+          "judge_input": 1937,
+          "judge_cache_hit": 1408,
+          "judge_cache_miss": 529,
+          "judge_output": 314,
+          "total_input": 2979,
+          "total_output": 762,
+          "total_tokens": 3741
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.004647,
+          "peak_total": 0.009294,
+          "off_peak_rag": 0.002834,
+          "off_peak_judge": 0.001813,
+          "peak_rag": 0.005668,
+          "peak_judge": 0.003626
+        }
+      }
+    },
+    {
+      "id": "GEN-24",
+      "category": "parametric",
+      "query": "网关重试机制中，三次重试的指数避让间隔时间具体分别是多少毫秒？最多允许重试几次？",
+      "answerable": true,
+      "reference_answer": "网关重试机制采用指数避让策略，三次重试的时间间隔分别为 200 毫秒、400 毫秒、800 毫秒；全局最多重试 3 次。",
+      "generated_answer": "## 回答\n\n**关于“三次重试的指数避让间隔”：**\n\n根据当前知识库检索结果，参考资料中**未记载“三次重试”的机制，也未给出指数避让（exponential backoff）各次的具体间隔数值**，无法回答该部分内容，亦不作推测。\n\n**关于参考资料中确实记载的重试规则：**\n\n- 重试仅适用于具有幂等性的 GET 查询请求，系统允许在超时后自动发起**最多 2 次**重试（即并非三次）[Ref-1]。\n- 重试退避间隔参数 `initial_interval_ms` 的配置值为 **500 毫秒**，该参数被描述为“初始间隔”，参考资料中未进一步说明后续各次重试的间隔取值或指数递增倍数 [Ref-1]。\n- 对于非幂等性的 POST 请求，网关**严禁自动重试** [Ref-1]。\n\n**缺失项说明：**\n\n1. 参考资料未记载“三次重试”，实际配置为最多 2 次 [Ref-1]；\n2. 除初始退避间隔 500 毫秒外，参考资料未提供第二次重试的间隔数值；\n3. 参考资料未出现“指数避让”或“指数退避”相关表述，无法确认该机制的具体实现方式及各次间隔。\n\n如需指数避让的完整间隔序列，建议补充检索网关重试退避策略的详细配置文档。",
+      "citations_count": 1,
+      "citations": [
+        {
+          "citation_index": 1,
+          "chunk_id": "e55427ef-406d-4ba1-8db0-8f8936fa4d34",
+          "document_id": "848c99da-9152-41ca-a3d8-d77f0edf50ed",
+          "document_name": "microservice_gateway_spec.md",
+          "page_number": 2,
+          "similarity_score": 0.983576,
+          "content_snippet": "## 1. 流量接入与超时控制\n微服务网关作为整个系统的流量接入入口，负责所有业务微服务与下游大模型代理的统一反向代理与动态路由。\n为保障系统吞吐量并防止慢请求占用连接，网关对下游接口设置严格的超时阈值。\n全局接口超时参数为 timeout，其统一配置阈值为 5000 毫秒（即 5 秒）。\n当针对大模型服务端推理耗时超过 5000ms 时，网关将主动中断 HTTP 传输连接，并向客户端抛出 ...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 2 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 4390.8,
+        "client_generation_ms": 1809.39,
+        "client_total_ms": 6225.59,
+        "server_ttft_ms": 2757.96,
+        "server_generation_ms": 4565.97,
+        "server_total_ms": 6184.24,
+        "dense_branch_duration_ms": 12.78,
+        "bm25_branch_duration_ms": 0.26,
+        "parallel_retrieval_wall_ms": 13.04,
+        "rrf_duration_ms": 0.08,
+        "reranker_duration_ms": 1591.3,
+        "total_retrieval_duration_ms": 1604.34,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1200,
+        "output_tokens": 508,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-24",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 1,
+        "correctness_reason": "参考答案明确为三次重试间隔 200/400/800 毫秒且最多重试 3 次，而回答称未记载三次重试、实际最多 2 次、初始间隔 500 毫秒，核心事实与参考答案完全相反。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "回答中所有声明（最多 2 次重试、initial_interval_ms=500ms、POST 严禁重试、未记载指数避让）均严格对应 Ref-1 原文，无脑补或幻觉。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "所有引用角标 [Ref-1] 均精确指向支持该结论的分块，无虚假引用或错引。",
+        "relevancy_score": 4,
+        "relevancy_reason": "回答紧扣重试次数与间隔问题，结构清晰；但额外列出 POST 严禁重试等背景信息，略有冗余。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 4,
+          "unique_cited_indices": [
+            1
+          ],
+          "valid_indices": [
+            1
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 1
+        },
+        "rejection_detected": true,
+        "rejection_reason": "问题在上下文中无依据（answerable=false），系统明确说明未找到三次重试及指数避让间隔依据并拒绝推测，属正确拒答。",
+        "overall_score": 3.75,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 2141,
+        "judge_output_tokens": 300,
+        "judge_cache_hit_tokens": 1664,
+        "judge_cache_miss_tokens": 477,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 1,\n    \"reason\": \"参考答案明确为三次重试间隔 200/400/800 毫秒且最多重试 3 次，而回答称未记载三次重试、实际最多 2 次、初始间隔 500 毫秒，核心事实与参考答案完全相反。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"回答中所有声明（最多 2 次重试、initial_interval_ms=500ms、POST 严禁重试、未记载指数避让）均严格对应 Ref-1 原文，无脑补或幻觉。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"所有引用角标 [Ref-1] 均精确指向支持该结论的分块，无虚假引用或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 4,\n    \"reason\": \"回答紧扣重试次数与间隔问题，结构清晰；但额外列出 POST 严禁重试等背景信息，略有冗余。\"\n  },\n  \"rejection\": {\n    \"detected\": true,\n    \"reason\": \"问题在上下文中无依据（answerable=false），系统明确说明未找到三次重试及指数避让间隔依据并拒绝推测，属正确拒答。\"\n  }\n}",
+        "duration_ms": 4422.06
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1200,
+          "rag_output": 508,
+          "judge_input": 2141,
+          "judge_cache_hit": 1664,
+          "judge_cache_miss": 477,
+          "judge_output": 300,
+          "total_input": 3341,
+          "total_output": 808,
+          "total_tokens": 4149
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.004942,
+          "peak_total": 0.009885,
+          "off_peak_rag": 0.003232,
+          "off_peak_judge": 0.00171,
+          "peak_rag": 0.006464,
+          "peak_judge": 0.003421
+        }
+      }
+    },
+    {
+      "id": "GEN-14",
+      "category": "multi_hop",
+      "query": "动态熔断器从何种异常触发条件从 CLOSED 切换至 OPEN 状态？在 OPEN 状态维持多长时间后进入 HALF_OPEN？需要满足怎样的探测标准才能最终恢复为 CLOSED 状态？",
+      "answerable": true,
+      "reference_answer": "根据高可用动态熔断架构规范：1. 触发 OPEN 条件：在 30 秒滑动时间窗口内，外部模型服务接口调用失败达到 5 次且失败率超过 50% 时，熔断器瞬间触发从 CLOSED 切换进入 OPEN 状态；2. 进入 HALF_OPEN：在 OPEN 状态达到 60 秒静默期后，系统自动切换为 HALF_OPEN 半开状态；3. 恢复 CLOSED 标准：在 HALF_OPEN 阶段放行 10% 试探流量，连续 5 次试探成功且每次端到端延迟均低于 2000 毫秒，则自动恢复为 CLOSED 闭合状态；若试探中有任何 1 次失败或超时则退回 OPEN 状态并重新开始 60 秒静默。",
+      "generated_answer": "根据参考资料，动态三态熔断器的状态流转规则如下：\n\n## 1. 从 CLOSED 切换至 OPEN 的触发条件\n\n熔断器从 CLOSED 状态切换至 OPEN 状态，遵循滑动时间窗口统计规则：在连续 30 秒的滑动时间窗口内，只要满足以下任一条件，熔断器就会立即触发，并从 CLOSED 切换至 OPEN：\n\n- 针对外部模型服务或接口的**连续失败调用次数达到 5 次**；\n- 或者**请求失败率超过 50%**，其中失败请求包括网络超时、5xx 服务端错误及连接拒绝 [Ref-2]。\n\n在 OPEN 状态下，系统会直接拦截并阻断 100% 的上游调用请求，不再发起实际远程网络调用，而是直接返回降级兜底提示文本 [Ref-2]。\n\n## 2. OPEN 状态进入 HALF_OPEN 的等待时长\n\n当熔断器持续处于 OPEN 状态并达到 **60 秒冷静期**后，系统定时器会自动触发，将熔断器状态切换为 HALF_OPEN 半开状态 [Ref-1]。\n\n## 3. HALF_OPEN 恢复为 CLOSED 的探测标准\n\n在 HALF_OPEN 阶段，系统允许放行 **10% 的真实生产试探流量**进入下游模型服务 [Ref-1]。恢复为 CLOSED 需同时满足以下两点：\n\n- 试探请求**连续 5 次成功响应**；\n- 且其中**每次调用的端到端延迟均低于 2000 毫秒** [Ref-1]。\n\n满足上述条件后，熔断器即判定下游服务已完全自愈，状态自动恢复为 CLOSED 状态；反之，只要试探请求中发生**任何 1 次调用失败或超时**，熔断器就会立刻退回 OPEN 状态，并重新开始计算 60 秒冷静恢复周期 [Ref-1]。\n\n以上参数（30 秒滑动窗口、5 次连续失败、50% 失败率、60 秒冷静期、10% 试探流量、5 次成功与 2000 毫秒延迟阈值）均已在参考资料中明确记载，无缺失项。",
+      "citations_count": 2,
+      "citations": [
+        {
+          "citation_index": 2,
+          "chunk_id": "418a52bd-59c7-475d-838e-39c37db3b936",
+          "document_id": "b57de31e-3b75-4316-83b3-e1db19474c88",
+          "document_name": "high_availability_resilience.md",
+          "page_number": 3,
+          "similarity_score": 0.991892,
+          "content_snippet": "## 2. 熔断触发标准与保护机制\n三态熔断器由 CLOSED 转移至 OPEN 状态的触发条件遵循滑动时间窗口统计规则：\n在连续 30 秒的滑动时间窗口内，当针对外部模型服务或接口的连续失败调用次数达到 5 次，或者请求失败率（包括网络超时、5xx 服务端错误及连接拒绝）超过 50% 时，熔断器瞬间触发并由 CLOSED 转移进入 OPEN 状态。\n在 OPEN 状态下，系统将直接拦截并阻...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 3 页"
+        },
+        {
+          "citation_index": 1,
+          "chunk_id": "8654084a-9408-4fb2-8149-30dec70832e7",
+          "document_id": "b57de31e-3b75-4316-83b3-e1db19474c88",
+          "document_name": "high_availability_resilience.md",
+          "page_number": 4,
+          "similarity_score": 0.996514,
+          "content_snippet": "## 3. 半开自愈探测与状态恢复流程\n当熔断器持续处于 OPEN 状态达到 60 秒冷静期后，系统定时器自动触发，将熔断器状态切换为 HALF_OPEN 半开状态。\n在 HALF_OPEN 阶段，系统允许放行 10% 的真实生产试探流量进入下游模型服务。\n若试探请求连续 5 次成功响应且每次调用端到端延迟均低于 2000 毫秒，熔断器即判定下游服务已完全自愈，状态自动恢复为 CLOSED ...",
+          "source_type": null,
+          "heading_path": null,
+          "block_index": null,
+          "line_start": null,
+          "line_end": null,
+          "provenance_label": "第 4 页"
+        }
+      ],
+      "kept_chunks_count": 4,
+      "performance": {
+        "transport_used": "tcp",
+        "client_ttft_ms": 6019.05,
+        "client_generation_ms": 1847.05,
+        "client_total_ms": 7952.96,
+        "server_ttft_ms": 4167.51,
+        "server_generation_ms": 6050.13,
+        "server_total_ms": 7886.8,
+        "dense_branch_duration_ms": 13.28,
+        "bm25_branch_duration_ms": 0.48,
+        "parallel_retrieval_wall_ms": 13.56,
+        "rrf_duration_ms": 0.09,
+        "reranker_duration_ms": 1802.01,
+        "total_retrieval_duration_ms": 1815.57,
+        "rewrite_duration_ms": 0.0,
+        "input_tokens": 1218,
+        "output_tokens": 590,
+        "llm_model_tested": "deepseek-flash"
+      },
+      "judge_evaluation": {
+        "sample_id": "GEN-14",
+        "status": "success",
+        "error_message": null,
+        "correctness_score": 4,
+        "correctness_reason": "核心参数（30秒窗口、5次失败、50%失败率、60秒冷静期、10%试探流量、5次成功、2000毫秒延迟）均准确，但将触发条件表述为“连续失败调用次数达到5次”，而参考标准为“失败达到5次”，且上下文Ref-2原文为“连续失败调用次数达到5次”，与参考标准存在细微差异，但未影响主结论。",
+        "faithfulness_score": 5,
+        "faithfulness_reason": "回答中所有声明（包括触发条件、等待时长、探测标准及失败退回逻辑）均可在Ref-1和Ref-2中找到直接证据支持，无脑补或幻觉。",
+        "citation_accuracy_score": 5,
+        "citation_reason": "引用角标[Ref-2]和[Ref-1]精确对应支持相应结论的分块，无虚假引用或错引。",
+        "relevancy_score": 5,
+        "relevancy_reason": "回答直击提问的三个核心点（触发条件、OPEN至HALF_OPEN时长、恢复CLOSED标准），结构清晰，无冗余废话。",
+        "programmatic_citation_valid": true,
+        "citation_details": {
+          "total_citation_tags": 6,
+          "unique_cited_indices": [
+            1,
+            2
+          ],
+          "valid_indices": [
+            1,
+            2
+          ],
+          "invalid_indices": [],
+          "total_kept_chunks": 4,
+          "extracted_citations_count": 2
+        },
+        "rejection_detected": false,
+        "rejection_reason": "问题在上下文中可回答，系统未拒答且给出了完整回答。",
+        "overall_score": 4.75,
+        "judge_model": "deepseek-flash",
+        "judge_model_returned": "deepseek-flash",
+        "judge_input_tokens": 2475,
+        "judge_output_tokens": 319,
+        "judge_cache_hit_tokens": 1792,
+        "judge_cache_miss_tokens": 683,
+        "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 4,\n    \"reason\": \"核心参数（30秒窗口、5次失败、50%失败率、60秒冷静期、10%试探流量、5次成功、2000毫秒延迟）均准确，但将触发条件表述为“连续失败调用次数达到5次”，而参考标准为“失败达到5次”，且上下文Ref-2原文为“连续失败调用次数达到5次”，与参考标准存在细微差异，但未影响主结论。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"回答中所有声明（包括触发条件、等待时长、探测标准及失败退回逻辑）均可在Ref-1和Ref-2中找到直接证据支持，无脑补或幻觉。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"引用角标[Ref-2]和[Ref-1]精确对应支持相应结论的分块，无虚假引用或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 5,\n    \"reason\": \"回答直击提问的三个核心点（触发条件、OPEN至HALF_OPEN时长、恢复CLOSED标准），结构清晰，无冗余废话。\"\n  },\n  \"rejection\": {\n    \"detected\": false,\n    \"reason\": \"问题在上下文中可回答，系统未拒答且给出了完整回答。\"\n  }\n}",
+        "duration_ms": 4425.65
+      },
+      "cost_accounting": {
+        "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+        "tokens": {
+          "rag_input": 1218,
+          "rag_output": 590,
+          "judge_input": 2475,
+          "judge_cache_hit": 1792,
+          "judge_cache_miss": 683,
+          "judge_output": 319,
+          "total_input": 3693,
+          "total_output": 909,
+          "total_tokens": 4602
+        },
+        "cost_rmb": {
+          "off_peak_total": 0.005573,
+          "peak_total": 0.011146,
+          "off_peak_rag": 0.003578,
+          "off_peak_judge": 0.001995,
+          "peak_rag": 0.007156,
+          "peak_judge": 0.00399
+        }
+      }
+    }
+  ]
+}

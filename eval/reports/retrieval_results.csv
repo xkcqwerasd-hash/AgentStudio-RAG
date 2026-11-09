@@ -1,0 +1,5 @@
+scheme_id,scheme_name,recall@1,recall@3,recall@5,recall@10,precision@5,mrr@10,ndcg@10,latency_p50_ms,latency_p95_ms,latency_mean_ms
+A,Dense Only (BGE-small-zh),0.825,1.0,1.0,1.0,0.23,0.9417,0.9547,11.64,13.86,11.64
+B,BM25 Only (Lucene Positive IDF),0.925,1.0,1.0,1.0,0.23,1.0,0.9964,0.37,0.57,0.37
+C,Dense + BM25 + RRF (k=60),0.875,1.0,1.0,1.0,0.23,0.975,0.9797,11.47,12.96,11.33
+D,Hybrid + Cross-Encoder Reranker,0.925,0.975,1.0,1.0,0.23,1.0,0.9972,1333.78,1434.55,1328.77

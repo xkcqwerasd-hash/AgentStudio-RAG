@@ -1,0 +1,137 @@
+{
+  "benchmark_stage": "E2.1.2_generation_smoke_test_v2",
+  "timestamp": "2026-11-06T03:26:14.671099+00:00",
+  "transport_mode": "tcp",
+  "sample_evaluated": {
+    "id": "GEN-01",
+    "category": "single_fact",
+    "query": "企业数据安全等级规范中，数据资产划分为哪四个具体级别？各级别的定义是什么？",
+    "answerable": true,
+    "reference_answer": "企业数据安全等级规范将数据划分为四个级别：1. 公开（Public）：系统使用手册与开源文档；2. 内部（Internal）：企业内部员工可见的常用知识库；3. 机密（Confidential）：企业核心技术文档、用户隐私对话数据，实施落盘加密；4. 受限（Restricted）：最高安全级别的核心资产、密码与支付凭证，严禁出域。",
+    "generated_answer": "根据企业数据安全分级规范，平台对数据实行四级分类分级制度，具体级别及定义如下 [Ref-1]：\n\n## 四级数据分类及定义\n\n| 级别 | 名称 | 定义 |\n|------|------|------|\n| 第一级 | **公开级（Public）** | 系统公开技术手册与开源文档 [Ref-1] |\n| 第二级 | **内部级（Internal）** | 仅限企业内部员工访问的常规知识库 [Ref-1] |\n| 第三级 | **机密级（Confidential）** | 包含业务细节的技术规格文档及用户私有多轮对话数据，必须实施落盘加密存储 [Ref-1] |\n| 第四级 | **绝密级（Restricted）** | 核心业务机密与敏感凭证，严禁离开隔离专用内网环境 [Ref-1] |\n\n## 补充说明\n\n该分级制度的设立依据是中国网络安全法及 GDPR 规范，适用于平台内产生与流转的所有数据，覆盖范围包括公开技术文档、企业内部知识库、业务技术规格与用户对话数据，以及核心业务机密与敏感凭证等 [Ref-1]。相关规范收录于《企业数据安全分级与审计合规指南》[Ref-2]。\n\n> 说明：以上四个级别为严格按参考材料所述顺序排列，材料本身未使用\"第一级/第二级\"等序号表述，此处序号仅用于表格呈现，便于对照阅读。",
+    "citations_count": 2,
+    "citations": [
+      {
+        "citation_index": 1,
+        "chunk_id": "b785e2dc-9b61-42f1-a298-ae9789a2bca7",
+        "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+        "document_name": "compliance_and_audit.md",
+        "page_number": 2,
+        "similarity_score": 0.985968,
+        "content_snippet": "## 1. 数据分类分级原则与标准\n为满足企业级数据合规与金融监管要求，系统遵循中国网络安全法及 GDPR 规范，对平台内产生与流转的所有数据实行四级分类分级制度：\n公开级（Public）：系统公开技术手册与开源文档；\n内部级（Internal）：仅限企业内部员工访问的常规知识库；\n机密级（Confidential）：包含业务细节的技术规格文档及用户私有多轮对话数据，必须实施落盘加密存储；\n...",
+        "source_type": null,
+        "heading_path": null,
+        "block_index": null,
+        "line_start": null,
+        "line_end": null,
+        "provenance_label": "第 2 页"
+      },
+      {
+        "citation_index": 2,
+        "chunk_id": "8cd90672-4eae-4969-a039-583978ea5c92",
+        "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+        "document_name": "compliance_and_audit.md",
+        "page_number": 1,
+        "similarity_score": 0.674896,
+        "content_snippet": "# 企业数据安全分级与审计合规指南",
+        "source_type": null,
+        "heading_path": null,
+        "block_index": null,
+        "line_start": null,
+        "line_end": null,
+        "provenance_label": "第 1 页"
+      }
+    ],
+    "kept_chunks_count": 4,
+    "performance": {
+      "transport_used": "tcp",
+      "client_ttft_ms": 8626.98,
+      "client_generation_ms": 1524.1,
+      "client_total_ms": 10164.72,
+      "server_ttft_ms": 2245.12,
+      "server_generation_ms": 3762.42,
+      "server_total_ms": 5921.15,
+      "dense_branch_duration_ms": 624.94,
+      "bm25_branch_duration_ms": 601.2,
+      "parallel_retrieval_wall_ms": 627.54,
+      "rrf_duration_ms": 0.08,
+      "reranker_duration_ms": 1489.66,
+      "total_retrieval_duration_ms": 2117.2,
+      "rewrite_duration_ms": 0.0,
+      "input_tokens": 778,
+      "output_tokens": 365,
+      "llm_model_tested": "deepseek-flash"
+    },
+    "judge_evaluation": {
+      "sample_id": "GEN-01",
+      "status": "success",
+      "error_message": null,
+      "correctness_score": 5,
+      "correctness_reason": "回答完整列出公开、内部、机密、绝密四个级别及定义，与参考答案核心事实完全一致，仅级别名称用词（绝密级 vs 受限）属同义表述，不影响结论。",
+      "faithfulness_score": 5,
+      "faithfulness_reason": "所有级别定义、设立依据（网络安全法及GDPR）与适用范围均可在[Ref-1]中逐条找到依据，无上下文外的技术细节或脑补。",
+      "citation_accuracy_score": 5,
+      "citation_reason": "四个级别定义均正确标注[Ref-1]，指南名称标注[Ref-2]亦与对应分块内容相符，无虚假或错引。",
+      "relevancy_score": 4,
+      "relevancy_reason": "直接回答四个级别及定义，结构清晰；但补充说明中的设立依据与覆盖范围属额外背景铺垫，略有冗余。",
+      "programmatic_citation_valid": true,
+      "citation_details": {
+        "total_citation_tags": 7,
+        "unique_cited_indices": [
+          1,
+          2
+        ],
+        "valid_indices": [
+          1,
+          2
+        ],
+        "invalid_indices": [],
+        "total_kept_chunks": 4,
+        "extracted_citations_count": 2
+      },
+      "rejection_detected": false,
+      "rejection_reason": "问题在上下文中可回答，系统正常作答且未捏造，不涉及拒答场景。",
+      "overall_score": 4.75,
+      "judge_model": "deepseek-flash",
+      "judge_model_returned": "deepseek-flash",
+      "judge_input_tokens": 1824,
+      "judge_output_tokens": 271,
+      "judge_cache_hit_tokens": 0,
+      "judge_cache_miss_tokens": 1824,
+      "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 5,\n    \"reason\": \"回答完整列出公开、内部、机密、绝密四个级别及定义，与参考答案核心事实完全一致，仅级别名称用词（绝密级 vs 受限）属同义表述，不影响结论。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"所有级别定义、设立依据（网络安全法及GDPR）与适用范围均可在[Ref-1]中逐条找到依据，无上下文外的技术细节或脑补。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"四个级别定义均正确标注[Ref-1]，指南名称标注[Ref-2]亦与对应分块内容相符，无虚假或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 4,\n    \"reason\": \"直接回答四个级别及定义，结构清晰；但补充说明中的设立依据与覆盖范围属额外背景铺垫，略有冗余。\"\n  },\n  \"rejection\": {\n    \"detected\": false,\n    \"reason\": \"问题在上下文中可回答，系统正常作答且未捏造，不涉及拒答场景。\"\n  }\n}",
+      "duration_ms": 4066.5
+    },
+    "cost_accounting": {
+      "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+      "tokens": {
+        "rag_input": 778,
+        "rag_output": 365,
+        "judge_input": 1824,
+        "judge_cache_hit": 0,
+        "judge_cache_miss": 1824,
+        "judge_output": 271,
+        "total_input": 2602,
+        "total_output": 636,
+        "total_tokens": 3238
+      },
+      "cost_rmb": {
+        "off_peak_total": 0.005146,
+        "peak_total": 0.010292,
+        "off_peak_rag": 0.002238,
+        "off_peak_judge": 0.002908,
+        "peak_rag": 0.004476,
+        "peak_judge": 0.005816
+      }
+    }
+  },
+  "database_isolation": {
+    "eval_benchmark_sha256_before": "5118ca5fb8d9f136fe63b743b3afe9428962ec688d4b8ec84e2ee596bdfbe3d0",
+    "eval_benchmark_sha256_after": "5118ca5fb8d9f136fe63b743b3afe9428962ec688d4b8ec84e2ee596bdfbe3d0",
+    "eval_benchmark_untouched": true,
+    "agentstudio_rag_sha256_before": "0647329e9d097910c3b04ce6b1b0236ad6f1728c24b4bb65b05a4312779a4df9",
+    "agentstudio_rag_sha256_after": "0647329e9d097910c3b04ce6b1b0236ad6f1728c24b4bb65b05a4312779a4df9",
+    "agentstudio_rag_untouched": true,
+    "replica_conversations_created": 1,
+    "replica_messages_created": 2
+  }
+}

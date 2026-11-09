@@ -5,7 +5,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React 18](https://img.shields.io/badge/React-18-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
 [![Docker Ready](https://img.shields.io/badge/Docker-Local_%7C_Server-2496ED.svg?logo=docker&logoColor=white)](docs/DEPLOYMENT.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License: All Rights Reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red.svg)](#十二版权声明与鸣谢-copyright--acknowledgements)
 
 > **A full-stack Agentic RAG platform built with FastAPI, LangGraph, React and Docker, featuring hybrid retrieval, long-term memory, multi-user authentication and local/server deployment.**  
 > **版本标识**：`v1.3.0-rc.1` (`RC-Phoenix-2026`)
@@ -144,7 +144,7 @@ flowchart TD
 
 ```bash
 # 1. 克隆代码仓库
-git clone https://github.com/your-username/AgentStudio-RAG.git
+git clone https://github.com/xkcqwerasd-hash/AgentStudio-RAG.git
 cd AgentStudio-RAG
 
 # 2. 复制环境配置模板并填入您的大模型 API 密钥
@@ -292,11 +292,13 @@ Backup & Restore          | PASS     | Full PostgreSQL snapshot & uploads restor
 
 ---
 
-## 十二、开源许可证与鸣谢 (License & Acknowledgements)
+## 十二、版权声明与鸣谢 (Copyright & Acknowledgements)
 
-- 本项目基于 [MIT License](LICENSE) 开源发布。
-- 特别鸣谢开源社区优秀项目 [Ragent](https://github.com/nageoffer/ragent) 在企业级知识问答系统架构设计上的宝贵启发。
-- 感谢 FastAPI、LangChain/LangGraph、FastEmbed、PyMuPDF、React 以及 Ant Design 团队构建的卓越开源基石。
+- **版权所有 (Copyright Notice)**：本项目（AgentStudio-RAG）的全部源代码、架构设计、技术文档及评测基准数据著作权均归原作者所有，**保留所有权利 (All Rights Reserved)**。
+- **展示性质与无许可声明 (No License Granted)**：本项目在 GitHub 公开展示，**仅用于原作者个人技术能力、工程架构实践与技术交流之展示（Portfolio Showcase & Read-Only Viewing）**。**本项目目前未采用任何开源许可协议，亦未向任何第三方授予使用、修改、分发、复制、编译嵌入或商业化运营的许可（No License Granted）**。
+- **禁止使用范围 (Prohibited Actions)**：未经原作者书面明确授权，任何组织、商业实体或个人严禁将本项目全部或部分代码、算法流程、Prompt 编排或衍生工程用于任何商业运营、闭环 SaaS 售卖、商业咨询或二次分发。
+- **特别鸣谢 (Acknowledgements)**：特别鸣谢开源社区优秀项目 [Ragent](https://github.com/nageoffer/ragent) 在企业级知识问答系统架构设计上的宝贵启发。
+- **开源生态致谢**：感谢 FastAPI、LangChain/LangGraph、FastEmbed、PyMuPDF、React 以及 Ant Design 团队构建的卓越开源技术基石。
 
 ---
 *AgentStudio-RAG Team · Release Candidate v1.3.0-rc.1 · 2026*

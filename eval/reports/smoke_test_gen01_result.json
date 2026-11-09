@@ -1,0 +1,150 @@
+{
+  "benchmark_stage": "E2.1.2_generation_smoke_test",
+  "timestamp": "2026-11-06T02:44:54.027668+00:00",
+  "sample_evaluated": {
+    "id": "GEN-01",
+    "category": "single_fact",
+    "query": "企业数据安全等级规范中，数据资产划分为哪四个具体级别？各级别的定义是什么？",
+    "answerable": true,
+    "reference_answer": "企业数据安全等级规范将数据划分为四个级别：1. 公开（Public）：系统使用手册与开源文档；2. 内部（Internal）：企业内部员工可见的常用知识库；3. 机密（Confidential）：企业核心技术文档、用户隐私对话数据，实施落盘加密；4. 受限（Restricted）：最高安全级别的核心资产、密码与支付凭证，严禁出域。",
+    "generated_answer": "根据参考资料，系统对平台内产生与流转的所有数据实行**四级分类分级制度**，具体划分如下 [Ref-1]：\n\n## 一、四级分类及定义\n\n| 级别 | 名称 | 定义与管控要求 |\n|------|------|----------------|\n| 1 | **公开级（Public）** | 系统公开技术手册与开源文档 [Ref-1] |\n| 2 | **内部级（Internal）** | 仅限企业内部员工访问的常规知识库 [Ref-1] |\n| 3 | **机密级（Confidential）** | 包含业务细节的技术规格文档及用户私有多轮对话数据，必须实施落盘加密存储 [Ref-1] |\n| 4 | **绝密级（Restricted）** | 核心业务机密与敏感凭证，严禁离开隔离专用内网环境 [Ref-1] |\n\n## 二、制度依据与适用范围\n\n该分级制度的制定依据为《中国网络安全法》及 GDPR 规范，覆盖平台内产生与流转的所有数据 [Ref-1]，相关规范收录于《企业数据安全分级与审计合规指南》文档中 [Ref-2]。\n\n## 三、补充说明\n\n上述四个级别的划分与定义在检索到的资料中已完整给出；关于各级别在访问控制、脱敏、审批流程等方面的更细化管控细则，当前资料未作进一步说明。此外，资料中另涉及审计日志留存不少于 180 天、留存期满后转储至 WORM 对象存储归档桶等要求 [Ref-4]，属于审计追踪层面的规范，与上述数据分类分级属于不同维度，可作参考对照。",
+    "citations_count": 3,
+    "citations": [
+      {
+        "citation_index": 1,
+        "chunk_id": "b785e2dc-9b61-42f1-a298-ae9789a2bca7",
+        "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+        "document_name": "compliance_and_audit.md",
+        "page_number": 2,
+        "similarity_score": 0.985968,
+        "content_snippet": "## 1. 数据分类分级原则与标准\n为满足企业级数据合规与金融监管要求，系统遵循中国网络安全法及 GDPR 规范，对平台内产生与流转的所有数据实行四级分类分级制度：\n公开级（Public）：系统公开技术手册与开源文档；\n内部级（Internal）：仅限企业内部员工访问的常规知识库；\n机密级（Confidential）：包含业务细节的技术规格文档及用户私有多轮对话数据，必须实施落盘加密存储；\n...",
+        "source_type": null,
+        "heading_path": null,
+        "block_index": null,
+        "line_start": null,
+        "line_end": null,
+        "provenance_label": "第 2 页"
+      },
+      {
+        "citation_index": 2,
+        "chunk_id": "8cd90672-4eae-4969-a039-583978ea5c92",
+        "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+        "document_name": "compliance_and_audit.md",
+        "page_number": 1,
+        "similarity_score": 0.674896,
+        "content_snippet": "# 企业数据安全分级与审计合规指南",
+        "source_type": null,
+        "heading_path": null,
+        "block_index": null,
+        "line_start": null,
+        "line_end": null,
+        "provenance_label": "第 1 页"
+      },
+      {
+        "citation_index": 4,
+        "chunk_id": "3001dce5-d1d7-44ad-9070-c8cbafe8af81",
+        "document_id": "3993ab01-c25d-4490-b5cf-8564fade537b",
+        "document_name": "compliance_and_audit.md",
+        "page_number": 4,
+        "similarity_score": 0.020341,
+        "content_snippet": "## 3. 审计日志与追踪数据留存规范\n为确保系统所有行为具备可追溯性与法律合规证据力，系统对运维操作与模型调用实施全生命周期日志留存：\n管理员后台敏感操作记录、智能体多步执行 Trace 元数据以及安全风控拦截事件，必须在冷备份存储中保存不少于 180 天。\n留存期满 180 天的审计日志，统一转储至基于 WORM（单写多读防篡改）策略的对象存储归档桶中，满足长期审计调阅要求。",
+        "source_type": null,
+        "heading_path": null,
+        "block_index": null,
+        "line_start": null,
+        "line_end": null,
+        "provenance_label": "第 4 页"
+      }
+    ],
+    "kept_chunks_count": 4,
+    "performance": {
+      "client_ttft_ms": 10384.65,
+      "server_ttft_ms": 2613.17,
+      "client_total_ms": 10385.9,
+      "server_total_ms": 6478.02,
+      "retrieval_duration_ms": 2042.89,
+      "dense_duration_ms": 583.54,
+      "bm25_duration_ms": 577.37,
+      "rrf_duration_ms": 0.06,
+      "reranker_duration_ms": 1457.72,
+      "rewrite_duration_ms": 0.0,
+      "generation_duration_ms": 4408.69,
+      "input_tokens": 778,
+      "output_tokens": 407,
+      "llm_model_tested": "deepseek-flash"
+    },
+    "judge_evaluation": {
+      "sample_id": "GEN-01",
+      "status": "success",
+      "error_message": null,
+      "correctness_score": 4,
+      "correctness_reason": "四个级别的核心划分与各级定义基本准确，且与检索上下文一致；但第四级中文名称为“绝密级（Restricted）”，与参考标准答案中的“受限（Restricted）”在名称上不完全一致，虽英文标识与核心含义相符，仍属于主要事实中的轻微命名差异。",
+      "faithfulness_score": 5,
+      "faithfulness_reason": "回答中的分级名称、定义、制度依据、适用范围及补充说明（如审计日志留存180天、WORM归档）均能在 Ref-1、Ref-2、Ref-4 中找到直接依据；对未展开的访问控制、脱敏、审批流程等也明确说明资料未作进一步说明，无幻觉或脑补。",
+      "citation_accuracy_score": 5,
+      "citation_reason": "各级别定义均引用 [Ref-1]，制度依据与覆盖范围引用 [Ref-1]，指南文档名称引用 [Ref-2]，审计日志留存与WORM归档引用 [Ref-4]，引用分块与所述内容精确对应，无虚假引用或错引。",
+      "relevancy_score": 4,
+      "relevancy_reason": "回答直接给出四个级别及定义，结构清晰、核心切题；但第三部分补充说明引入了审计日志留存与WORM归档等与“数据分类分级”非直接相关的额外信息，存在一定冗余背景。",
+      "programmatic_citation_valid": true,
+      "citation_details": {
+        "total_citation_tags": 8,
+        "unique_cited_indices": [
+          1,
+          2,
+          4
+        ],
+        "valid_indices": [
+          1,
+          2,
+          4
+        ],
+        "invalid_indices": [],
+        "total_kept_chunks": 4,
+        "extracted_citations_count": 3
+      },
+      "rejection_detected": false,
+      "rejection_reason": "该问题在上下文中可回答，系统正常给出了具体分级与定义，未发生拒答。",
+      "overall_score": 4.5,
+      "judge_model": "deepseek-flash",
+      "judge_model_returned": "deepseek-flash",
+      "judge_input_tokens": 1748,
+      "judge_output_tokens": 1574,
+      "judge_cache_hit_tokens": 0,
+      "judge_cache_miss_tokens": 1748,
+      "raw_judge_response": "{\n  \"correctness\": {\n    \"score\": 4,\n    \"reason\": \"四个级别的核心划分与各级定义基本准确，且与检索上下文一致；但第四级中文名称为“绝密级（Restricted）”，与参考标准答案中的“受限（Restricted）”在名称上不完全一致，虽英文标识与核心含义相符，仍属于主要事实中的轻微命名差异。\"\n  },\n  \"faithfulness\": {\n    \"score\": 5,\n    \"reason\": \"回答中的分级名称、定义、制度依据、适用范围及补充说明（如审计日志留存180天、WORM归档）均能在 Ref-1、Ref-2、Ref-4 中找到直接依据；对未展开的访问控制、脱敏、审批流程等也明确说明资料未作进一步说明，无幻觉或脑补。\"\n  },\n  \"citation_accuracy\": {\n    \"score\": 5,\n    \"reason\": \"各级别定义均引用 [Ref-1]，制度依据与覆盖范围引用 [Ref-1]，指南文档名称引用 [Ref-2]，审计日志留存与WORM归档引用 [Ref-4]，引用分块与所述内容精确对应，无虚假引用或错引。\"\n  },\n  \"relevancy\": {\n    \"score\": 4,\n    \"reason\": \"回答直接给出四个级别及定义，结构清晰、核心切题；但第三部分补充说明引入了审计日志留存与WORM归档等与“数据分类分级”非直接相关的额外信息，存在一定冗余背景。\"\n  },\n  \"rejection\": {\n    \"detected\": false,\n    \"reason\": \"该问题在上下文中可回答，系统正常给出了具体分级与定义，未发生拒答。\"\n  }\n}",
+      "duration_ms": 12403.24
+    },
+    "cost_accounting": {
+      "pricing_model": "deepseek-flash (DeepSeek-V4.1-Flash-1017)",
+      "tokens": {
+        "rag_input": 778,
+        "rag_output": 407,
+        "judge_input": 1748,
+        "judge_cache_hit": 0,
+        "judge_cache_miss": 1748,
+        "judge_output": 1574,
+        "total_input": 2526,
+        "total_output": 1981,
+        "total_tokens": 4507
+      },
+      "cost_rmb": {
+        "off_peak_total": 0.01045,
+        "peak_total": 0.0209,
+        "off_peak_rag": 0.002406,
+        "off_peak_judge": 0.008044,
+        "peak_rag": 0.004812,
+        "peak_judge": 0.016088
+      }
+    }
+  },
+  "database_isolation": {
+    "eval_benchmark_sha256_before": "5118ca5fb8d9f136fe63b743b3afe9428962ec688d4b8ec84e2ee596bdfbe3d0",
+    "eval_benchmark_sha256_after": "5118ca5fb8d9f136fe63b743b3afe9428962ec688d4b8ec84e2ee596bdfbe3d0",
+    "eval_benchmark_untouched": true,
+    "agentstudio_rag_sha256_before": "0647329e9d097910c3b04ce6b1b0236ad6f1728c24b4bb65b05a4312779a4df9",
+    "agentstudio_rag_sha256_after": "0647329e9d097910c3b04ce6b1b0236ad6f1728c24b4bb65b05a4312779a4df9",
+    "agentstudio_rag_untouched": true,
+    "replica_conversations_created": 1,
+    "replica_messages_created": 2
+  }
+}

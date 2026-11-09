@@ -1,0 +1,91 @@
+{
+  "timestamp": "2026-11-09 13:07:36",
+  "sample_id": "GEN-11",
+  "model": "deepseek-chat",
+  "api_endpoint": "https://api.deepseek.com",
+  "metrics": {
+    "sent_max_tokens": 4096,
+    "finish_reason": "stop",
+    "prompt_tokens": 1178,
+    "completion_tokens": 486,
+    "reasoning_tokens": null,
+    "server_ttft_ms": 1763.4,
+    "client_ttft_ms": 7812.87,
+    "client_generation_ms": 2439.79,
+    "client_total_ms": 10301.12,
+    "output_chars": 843,
+    "generation_status": "completed",
+    "is_truncated": false,
+    "done_received": true
+  },
+  "fact_coverage": {
+    "fact_1_window_and_threshold": true,
+    "fact_2_open_and_intercept": true,
+    "fact_3_failover_secondary": true,
+    "fact_4_static_rule_fallback": true
+  },
+  "truncation_check": {
+    "truncated_at_hash2": false,
+    "incomplete_ending": false
+  },
+  "generated_answer": "根据参考资料，当主大模型服务持续出现 5xx 错误时，系统的完整处理流程如下：\n\n**第一步：触发熔断（CLOSED → OPEN）**\n在连续 30 秒的滑动时间窗口内，当针对外部模型服务的连续失败调用次数达到 5 次，或者请求失败率（包括网络超时、5xx 服务端错误及连接拒绝）超过 50% 时，熔断器瞬间触发，由 CLOSED 状态转移进入 OPEN 状态 [Ref-1]。\n\n**第二步：流量切断与降级兜底**\n在 OPEN 状态下，系统将直接拦截并阻断 100% 的上游调用请求，不再发起实际远程网络调用，而是直接降级返回友好的降级兜底提示文本，以保护系统核心吞吐 [Ref-1]。\n\n**第三步：执行模型降级转移（Failover）**\n当某一大模型服务发生宕机、严重网络拥塞或因熔断器进入 OPEN 状态时，系统路由引擎执行预设的多级故障转移策略，模型调用优先级降级顺序为 [Ref-2]：\n- 第一顺位 Primary 优选模型：DeepSeek-V3；\n- 第二顺位 Secondary 备选模型：SiliconFlow 托管的 Qwen-2.5-72B（当 Primary 熔断触发或不可用时无缝切换）；\n- 第三顺位 Fallback 兜底模型：本地 Ollama 部署的轻量化 Llama-3.1（当外部公网完全中断时用于本地紧急离线运行）[Ref-2]。\n\n**补充说明（自愈恢复路径）**：熔断器持续处于 OPEN 状态达到 60 秒冷静期后，会自动切换为 HALF_OPEN 半开状态，放行 10% 的真实生产试探流量；若试探请求连续 5 次成功且每次端到端延迟均低于 2000 毫秒，则恢复为 CLOSED 状态，否则立刻退回 OPEN 并重新计算 60 秒冷静周期 [Ref-4]。\n\n**缺失项说明**：参考资料未说明熔断触发后路由引擎切换到备选模型的具体切换时延数值，也未说明 5xx 错误在失败率统计中的具体权重或单独计数规则，上述内容无法回答。",
+  "citations": [
+    {
+      "citation_index": 1,
+      "chunk_id": "418a52bd-59c7-475d-838e-39c37db3b936",
+      "document_id": "b57de31e-3b75-4316-83b3-e1db19474c88",
+      "document_name": "high_availability_resilience.md",
+      "page_number": 3,
+      "similarity_score": 0.967826,
+      "content_snippet": "## 2. 熔断触发标准与保护机制\n三态熔断器由 CLOSED 转移至 OPEN 状态的触发条件遵循滑动时间窗口统计规则：\n在连续 30 秒的滑动时间窗口内，当针对外部模型服务或接口的连续失败调用次数达到 5 次，或者请求失败率（包括网络超时、5xx 服务端错误及连接拒绝）超过 50% 时，熔断器瞬间触发并由 CLOSED 转移进入 OPEN 状态。\n在 OPEN 状态下，系统将直接拦截并阻...",
+      "source_type": null,
+      "heading_path": null,
+      "block_index": null,
+      "line_start": null,
+      "line_end": null,
+      "provenance_label": "第 3 页"
+    },
+    {
+      "citation_index": 2,
+      "chunk_id": "a5cce34c-d64f-4df4-86ec-37fba6516dea",
+      "document_id": "b57de31e-3b75-4316-83b3-e1db19474c88",
+      "document_name": "high_availability_resilience.md",
+      "page_number": 6,
+      "similarity_score": 0.94005,
+      "content_snippet": "## 5. 跨模型多级故障转移 Failover 策略\n当某一大模型服务发生宕机、严重网络拥塞或因熔断器进入 OPEN 状态时，系统路由引擎执行预设的多级故障转移（Failover）策略。\n模型调用优先级降级顺序如下：\n第一顺位 Primary 优选模型：DeepSeek-V3；\n第二顺位 Secondary 备选模型：SiliconFlow 托管的 Qwen-2.5-72B（当 Prima...",
+      "source_type": null,
+      "heading_path": null,
+      "block_index": null,
+      "line_start": null,
+      "line_end": null,
+      "provenance_label": "第 6 页"
+    },
+    {
+      "citation_index": 4,
+      "chunk_id": "8654084a-9408-4fb2-8149-30dec70832e7",
+      "document_id": "b57de31e-3b75-4316-83b3-e1db19474c88",
+      "document_name": "high_availability_resilience.md",
+      "page_number": 4,
+      "similarity_score": 0.370526,
+      "content_snippet": "## 3. 半开自愈探测与状态恢复流程\n当熔断器持续处于 OPEN 状态达到 60 秒冷静期后，系统定时器自动触发，将熔断器状态切换为 HALF_OPEN 半开状态。\n在 HALF_OPEN 阶段，系统允许放行 10% 的真实生产试探流量进入下游模型服务。\n若试探请求连续 5 次成功响应且每次调用端到端延迟均低于 2000 毫秒，熔断器即判定下游服务已完全自愈，状态自动恢复为 CLOSED ...",
+      "source_type": null,
+      "heading_path": null,
+      "block_index": null,
+      "line_start": null,
+      "line_end": null,
+      "provenance_label": "第 4 页"
+    }
+  ],
+  "historical_comparison": {
+    "historical_output_tokens": 2048,
+    "historical_server_ttft_ms": 14522.2,
+    "historical_output_chars": 326,
+    "historical_truncation": "Truncated abruptly at ### 2",
+    "historical_finish_reason": "Not recorded (output_tokens == 2048)",
+    "current_output_tokens": 486,
+    "current_server_ttft_ms": 1763.4,
+    "current_output_chars": 843,
+    "current_truncation": "None",
+    "current_finish_reason": "stop"
+  }
+}

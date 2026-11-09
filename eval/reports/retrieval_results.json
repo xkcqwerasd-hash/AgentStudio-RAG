@@ -1,0 +1,1204 @@
+{
+  "metadata": {
+    "timestamp": "2026-11-05T12:44:27.634151+00:00",
+    "git_commit": "0d4eb7a",
+    "sample_count": 20,
+    "embedding_model": "BAAI/bge-small-zh-v1.5",
+    "reranker_model": "Xenova/bge-reranker-base",
+    "db_path": "backend\\data\\storage\\eval_benchmark.db",
+    "fixture_hashes": {
+      "compliance_and_audit.md": "6a8d249a86b334f37f7a7ce93ab545ef6454336bb72808200d48e1c181fa0df7",
+      "high_availability_resilience.md": "feb50096f81c77977e8f51a6ec7b8265368fc135f04f61726147bf8025d512b5",
+      "microservice_gateway_spec.md": "5d7449dc650de0a5bcf1a0133db8aa9d4e4c54942d210a9f16d249099ba25ce3"
+    },
+    "parameters": {
+      "candidate_pool_size": 20,
+      "top_k": 10,
+      "rrf_k": 60,
+      "rrf_dense_weight": 1.0,
+      "rrf_bm25_weight": 1.0
+    }
+  },
+  "summary": [
+    {
+      "scheme_id": "A",
+      "scheme_name": "Dense Only (BGE-small-zh)",
+      "recall@1": 0.825,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "precision@5": 0.23,
+      "mrr@10": 0.9417,
+      "ndcg@10": 0.9547,
+      "latency_p50_ms": 11.64,
+      "latency_p95_ms": 13.86,
+      "latency_mean_ms": 11.64
+    },
+    {
+      "scheme_id": "B",
+      "scheme_name": "BM25 Only (Lucene Positive IDF)",
+      "recall@1": 0.925,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "precision@5": 0.23,
+      "mrr@10": 1.0,
+      "ndcg@10": 0.9964,
+      "latency_p50_ms": 0.37,
+      "latency_p95_ms": 0.57,
+      "latency_mean_ms": 0.37
+    },
+    {
+      "scheme_id": "C",
+      "scheme_name": "Dense + BM25 + RRF (k=60)",
+      "recall@1": 0.875,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "precision@5": 0.23,
+      "mrr@10": 0.975,
+      "ndcg@10": 0.9797,
+      "latency_p50_ms": 11.47,
+      "latency_p95_ms": 12.96,
+      "latency_mean_ms": 11.33
+    },
+    {
+      "scheme_id": "D",
+      "scheme_name": "Hybrid + Cross-Encoder Reranker",
+      "recall@1": 0.925,
+      "recall@3": 0.975,
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "precision@5": 0.23,
+      "mrr@10": 1.0,
+      "ndcg@10": 0.9972,
+      "latency_p50_ms": 1333.78,
+      "latency_p95_ms": 1434.55,
+      "latency_mean_ms": 1328.77
+    }
+  ],
+  "category_breakdowns": {
+    "numerical_and_parameter": {
+      "title": "数值与参数匹配场景",
+      "sample_count": 5,
+      "schemes": [
+        {
+          "scheme_name": "Dense Only",
+          "recall@1": 0.9,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.24,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9928,
+          "note": "语义理解强，专有名词略漂移"
+        },
+        {
+          "scheme_name": "BM25 Only",
+          "recall@1": 0.9,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.24,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9928,
+          "note": "字面精确命中强，同义表述失召"
+        },
+        {
+          "scheme_name": "RRF Hybrid",
+          "recall@1": 0.9,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.24,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9928,
+          "note": "双路互补融合，大幅提升覆盖度"
+        },
+        {
+          "scheme_name": "Hybrid+Reranker",
+          "recall@1": 0.9,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.24,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "note": "全面置顶核心答案，得分最高"
+        }
+      ]
+    },
+    "exact_keyword": {
+      "title": "精确技术关键词场景",
+      "sample_count": 5,
+      "schemes": [
+        {
+          "scheme_name": "Dense Only",
+          "recall@1": 0.8,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.2,
+          "mrr@10": 0.9,
+          "ndcg@10": 0.9262,
+          "note": "语义理解强，专有名词略漂移"
+        },
+        {
+          "scheme_name": "BM25 Only",
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.2,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "note": "字面精确命中强，同义表述失召"
+        },
+        {
+          "scheme_name": "RRF Hybrid",
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.2,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "note": "双路互补融合，大幅提升覆盖度"
+        },
+        {
+          "scheme_name": "Hybrid+Reranker",
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.2,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "note": "全面置顶核心答案，得分最高"
+        }
+      ]
+    },
+    "technical_terminology": {
+      "title": "专有名词与架构概念场景",
+      "sample_count": 5,
+      "schemes": [
+        {
+          "scheme_name": "Dense Only",
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.2,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "note": "语义理解强，专有名词略漂移"
+        },
+        {
+          "scheme_name": "BM25 Only",
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.2,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "note": "字面精确命中强，同义表述失召"
+        },
+        {
+          "scheme_name": "RRF Hybrid",
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.2,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "note": "双路互补融合，大幅提升覆盖度"
+        },
+        {
+          "scheme_name": "Hybrid+Reranker",
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.2,
+          "mrr@10": 1.0,
+          "ndcg@10": 1.0,
+          "note": "全面置顶核心答案，得分最高"
+        }
+      ]
+    },
+    "semantic_and_paraphrase": {
+      "title": "长句语义提问与同义表述场景",
+      "sample_count": 5,
+      "schemes": [
+        {
+          "scheme_name": "Dense Only",
+          "recall@1": 0.6,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.28,
+          "mrr@10": 0.8667,
+          "ndcg@10": 0.9,
+          "note": "语义理解强，专有名词略漂移"
+        },
+        {
+          "scheme_name": "BM25 Only",
+          "recall@1": 0.8,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.28,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.9928,
+          "note": "字面精确命中强，同义表述失召"
+        },
+        {
+          "scheme_name": "RRF Hybrid",
+          "recall@1": 0.6,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.28,
+          "mrr@10": 0.9,
+          "ndcg@10": 0.9262,
+          "note": "双路互补融合，大幅提升覆盖度"
+        },
+        {
+          "scheme_name": "Hybrid+Reranker",
+          "recall@1": 0.8,
+          "recall@3": 0.9,
+          "recall@5": 1.0,
+          "recall@10": 1.0,
+          "precision@5": 0.28,
+          "mrr@10": 1.0,
+          "ndcg@10": 0.989,
+          "note": "全面置顶核心答案，得分最高"
+        }
+      ]
+    }
+  },
+  "samples": [
+    {
+      "id": "Q01",
+      "category": "numerical_and_parameter",
+      "query": "微服务网关接口最长允许客户端等待超时的配置参数名称与具体阈值是多少毫秒？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q02",
+      "category": "numerical_and_parameter",
+      "query": "网关异步连接池中配置的最小空闲连接数 min_idle 与最大并发连接数 max_connections 分别是多少？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q03",
+      "category": "numerical_and_parameter",
+      "query": "系统无状态身份认证中颁发的 Access Token 默认有效期是多长时间？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q04",
+      "category": "numerical_and_parameter",
+      "query": "三态熔断器从 CLOSED 闭合状态切换为 OPEN 熔断状态时，需要满足怎样的滑动窗口和失败率阈值？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 0.9639
+      },
+      "metrics_bm25": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 0.9639
+      },
+      "metrics_rrf": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 0.9639
+      },
+      "metrics_rerank": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q05",
+      "category": "numerical_and_parameter",
+      "query": "管理员审计日志与智能体多步执行 Trace 元数据要求在冷备份存储中保留多少天？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q06",
+      "category": "exact_keyword",
+      "query": "系统采用哪种具体的非对称加密算法对 JWT 会话令牌进行数字签名与验签？",
+      "dense_rank": "2",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 0.5,
+        "ndcg@10": 0.6309
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q07",
+      "category": "exact_keyword",
+      "query": "网关公网接入层强制启用了哪种网络传输加密协议来实施证书卸载？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q08",
+      "category": "exact_keyword",
+      "query": "微服务网关针对幂等 GET 请求的自动重试次数及退避间隔 initial_interval_ms 是如何规定的？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q09",
+      "category": "exact_keyword",
+      "query": "熔断器进入 HALF_OPEN 阶段后，允许放行多少比例的真实生产试探流量？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q10",
+      "category": "exact_keyword",
+      "query": "系统中存储的外部大模型供应商 API Key 静态落盘加密采用何种对称加密算法？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q11",
+      "category": "technical_terminology",
+      "query": "系统内部的监控组件 ModelHealthStore 主要承担哪些核心管理职责？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q12",
+      "category": "technical_terminology",
+      "query": "三态熔断器（Circuit Breaker）标准状态机一共定义了哪三种核心运行状态？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q13",
+      "category": "technical_terminology",
+      "query": "系统对包含个人身份信息（PII）的用户输入在送入向量化模型前有何强制清洗脱敏要求？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q14",
+      "category": "technical_terminology",
+      "query": "当主选大模型 DeepSeek-V3 发生不可用或熔断时，系统多级故障转移 Failover 策略的后续顺位模型是什么？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q15",
+      "category": "technical_terminology",
+      "query": "根据企业数据安全分级制度，包含业务技术规格文档及用户私有多轮对话数据属于哪个密级？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q16",
+      "category": "semantic_and_paraphrase",
+      "query": "在业务高峰期，网关如果遇到连接数耗尽且等待排队队列溢出的极端情况会采取什么保护手段？",
+      "dense_rank": "3",
+      "bm25_rank": "1",
+      "rrf_rank": "2",
+      "rerank_rank": "1",
+      "analysis": "Reranker 精排将目标从第 2 位成功提升至第 1 位",
+      "metrics_dense": {
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 0.3333,
+        "ndcg@10": 0.5
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 0.5,
+        "ndcg@10": 0.6309
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q17",
+      "category": "semantic_and_paraphrase",
+      "query": "系统如何避免用户多轮长对话历史与频繁鉴权对中心认证服务造成的性能损耗？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q18",
+      "category": "semantic_and_paraphrase",
+      "query": "熔断器在完全切断外部流量后，经过多长时间冷静期才会开始试探下游健康状况并尝试自愈？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 0.9639
+      },
+      "metrics_rrf": {
+        "recall@1": 0.5,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 0.5,
+        "recall@3": 0.5,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.4,
+        "mrr@10": 1.0,
+        "ndcg@10": 0.9448
+      }
+    },
+    {
+      "id": "Q19",
+      "category": "semantic_and_paraphrase",
+      "query": "如果下游模型服务端推理极其缓慢并超出网关容忍极限，系统将如何中断连接并向客户端返回何种错误？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    {
+      "id": "Q20",
+      "category": "semantic_and_paraphrase",
+      "query": "系统对所有生产运行中产生的密钥与机密凭证制订了怎样的定期轮换与预警生命周期规则？",
+      "dense_rank": "1",
+      "bm25_rank": "1",
+      "rrf_rank": "1",
+      "rerank_rank": "1",
+      "analysis": "RRF 与 Reranker 均精准保持第 1 位",
+      "metrics_dense": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_bm25": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rrf": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "metrics_rerank": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "precision@5": 0.2,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    }
+  ]
+}
