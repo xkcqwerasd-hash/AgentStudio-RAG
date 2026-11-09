@@ -1,6 +1,6 @@
 # AgentStudio-RAG — 基于 Python 的企业级 Agentic RAG 智能知识问答系统
 
-[![Version](https://img.shields.io/badge/Release_Candidate-v1.3.0--rc.1-blue.svg)](docs/P2_3_RELEASE_CANDIDATE_REPORT.md)
+[![Version](https://img.shields.io/badge/Release_Candidate-v1.3.0--rc.3-blue.svg)](docs/PROJECT_FINAL_TECHNICAL_SUMMARY.md)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React 18](https://img.shields.io/badge/React-18-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
@@ -8,7 +8,7 @@
 [![License: All Rights Reserved](https://img.shields.io/badge/License-All_Rights_Reserved-red.svg)](#十二版权声明与鸣谢-copyright--acknowledgements)
 
 > **A full-stack Agentic RAG platform built with FastAPI, LangGraph, React and Docker, featuring hybrid retrieval, long-term memory, multi-user authentication and local/server deployment.**  
-> **版本标识**：`v1.3.0-rc.1` (`RC-Phoenix-2026`)
+> **版本标识**：`v1.3.0-rc.3` (`RC-Phoenix-2026`)
 
 AgentStudio-RAG 是参考 Java 生态企业级开源项目 [Ragent](https://github.com/nageoffer/ragent) 进行重新架构设计与深度重构的 **Python 原生企业级 Agentic RAG 智能知识问答系统**。
 
@@ -301,4 +301,4 @@ Backup & Restore          | PASS     | Full PostgreSQL snapshot & uploads restor
 - **开源生态致谢**：感谢 FastAPI、LangChain/LangGraph、FastEmbed、PyMuPDF、React 以及 Ant Design 团队构建的卓越开源技术基石。
 
 ---
-*AgentStudio-RAG Team · Release Candidate v1.3.0-rc.1 · 2026*
+*AgentStudio-RAG Team · Release Candidate v1.3.0-rc.3 · 2026*
