@@ -390,7 +390,7 @@ async def run_ablation():
             "sample_count": n_cat,
             "schemes": [
                 {"scheme_name": "Dense Only", **c_dense, "note": "语义理解强，专有名词略漂移"},
-                {"scheme_name": "BM25 Only", **c_bm25, "note": "字面精确命中强，同义表述失召"},
+                {"scheme_name": "BM25 Only", **c_bm25, "note": "基于倒排索引与词项统计的关键词检索"},
                 {"scheme_name": "RRF Hybrid", **c_rrf, "note": "双路互补融合，大幅提升覆盖度"},
                 {"scheme_name": "Hybrid+Reranker", **c_rerank, "note": "全面置顶核心答案，得分最高"},
             ],
